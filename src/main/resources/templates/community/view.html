@@ -93,29 +93,26 @@
         .edit-post-wrap textarea { width: 100%; padding: 14px 16px; border: 1px solid #1B8EF8; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; outline: none; min-height: 200px; }
         .edit-post-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
-		.modal-overlay { 
-		    display: none; 
-		    position: fixed; 
-		    inset: 0; 
-		    background: rgba(0,0,0,0.5); 
-		    z-index: 99999;  /* ← 높게 올리기 */
-		    align-items: center; 
-		    justify-content: center; 
-		}
-		
-		
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
         .modal-overlay.show { display: flex; }
-		.modal { 
-		    background: white; 
-		    border-radius: 16px; 
-		    padding: 32px; 
-		    width: 460px; 
-		    max-width: 95vw; 
-		    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-		    position: relative; 
-		    z-index: 100000;    
-		}
-		
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 460px;
+            max-width: 95vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 100000;
+        }
         .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .modal-subtitle { font-size: 13px; color: #999; margin-bottom: 24px; }
         .modal-target { background: #F5F7FA; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #666; margin-bottom: 20px; }
@@ -146,13 +143,13 @@
 <section>
 <div class="view-wrap">
 
-    <a th:href="@{/community(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
+    <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
 
-	<div th:if="${reportMsg != null}"
-     style="padding:12px 20px; background:#E3F2FF; color:#1B8EF8; 
-            border-radius:8px; margin-bottom:16px; font-size:14px; font-weight:600;"
-     th:text="${reportMsg}">
-	 </div>
+    <div th:if="${reportMsg != null}"
+         style="padding:12px 20px; background:#E3F2FF; color:#1B8EF8;
+                border-radius:8px; margin-bottom:16px; font-size:14px; font-weight:600;"
+         th:text="${reportMsg}">
+    </div>
 
     <!-- 게시글 카드 -->
     <div class="post-card">
@@ -165,9 +162,10 @@
 
         <!-- 게시글 수정 폼 -->
         <div class="edit-post-wrap" id="editPostWrap">
-            <form th:action="@{/community/edit}" method="post"
-      			onsubmit="return confirm('저장하시겠습니까?')">
+            <form action="http://localhost:8000/board-service/community/edit" method="post"
+                  onsubmit="return confirm('저장하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
+                <input type="hidden" name="boardId" th:value="${post.boardId}">
                 <input type="text" name="title" th:value="${post.title}" placeholder="제목" required>
                 <textarea name="content" rows="10" th:text="${post.content}" required></textarea>
                 <div class="edit-post-footer">
@@ -182,9 +180,9 @@
             <span th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">날짜</span>
             <span>조회 <span th:text="${post.viewCount}">0</span></span>
             <div class="post-meta-actions" id="postMetaActions" sec:authorize="isAuthenticated()"
-     			th:if="${#authentication.name == post.memberId}">
+                 th:if="${#authentication.name == post.memberId}">
                 <button class="btn-sm" onclick="toggleEditPost(true)">✏️ 수정</button>
-                <form th:action="@{/community/delete}" method="post" style="display:inline;"
+                <form action="http://localhost:8000/board-service/community/delete" method="post" style="display:inline;"
                       onsubmit="return confirm('삭제하시겠습니까?')">
                     <input type="hidden" name="postId" th:value="${post.postId}">
                     <button type="submit" class="btn-sm danger">🗑️ 삭제</button>
@@ -196,9 +194,9 @@
 
         <div class="post-footer">
             <button class="report-btn"
-			        th:data-id="${post.postId}"
-			        th:data-label="${post.title}"
-			        onclick="openReport(2, this.dataset.id, this.dataset.label)">
+                    th:data-id="${post.postId}"
+                    th:data-label="${post.title}"
+                    onclick="openReport(2, this.dataset.id, this.dataset.label)">
                 🚨 신고
             </button>
         </div>
@@ -207,13 +205,13 @@
     <!-- 이전/다음 글 -->
     <div class="post-nav">
         <a class="post-nav-item"
-           th:href="${prevPost != null} ? @{/community/view(postId=${prevPost.postId})} : '#'"
+           th:href="${prevPost != null} ? @{'http://localhost:8000/board-service/community/view'(postId=${prevPost.postId})} : '#'"
            th:classappend="${prevPost == null} ? 'disabled'">
             <span class="post-nav-label">▲ 이전</span>
             <span th:text="${prevPost != null} ? ${prevPost.title} : '이전 글이 없습니다.'">이전글</span>
         </a>
         <a class="post-nav-item"
-           th:href="${nextPost != null} ? @{/community/view(postId=${nextPost.postId})} : '#'"
+           th:href="${nextPost != null} ? @{'http://localhost:8000/board-service/community/view'(postId=${nextPost.postId})} : '#'"
            th:classappend="${nextPost == null} ? 'disabled'">
             <span class="post-nav-label">▼ 다음</span>
             <span th:text="${nextPost != null} ? ${nextPost.title} : '다음 글이 없습니다.'">다음글</span>
@@ -228,9 +226,10 @@
 
         <!-- 댓글 작성 -->
         <div class="comment-form" sec:authorize="isAuthenticated()">
-           <form th:action="@{/community/comment}" method="post"
-		      onsubmit="return confirm('댓글을 등록하시겠습니까?')">
-		    <input type="hidden" name="postId" th:value="${post.postId}">
+            <form action="http://localhost:8000/board-service/community/comment" method="post"
+                  onsubmit="return confirm('댓글을 등록하시겠습니까?')">
+                <input type="hidden" name="postId" th:value="${post.postId}">
+                <input type="hidden" name="boardId" th:value="${post.boardId}">
                 <textarea name="content" rows="3" placeholder="댓글을 입력하세요..." required></textarea>
                 <div class="comment-form-footer">
                     <button type="submit" class="comment-submit">댓글 등록</button>
@@ -239,7 +238,7 @@
         </div>
         <div sec:authorize="!isAuthenticated()"
              style="padding:14px; background:#F5F7FA; border-radius:8px; text-align:center; font-size:14px; color:#999; margin-bottom:24px;">
-            댓글을 작성하려면 <a th:href="@{/login}" style="color:#1B8EF8; font-weight:600;">로그인</a>이 필요합니다.
+            댓글을 작성하려면 <a href="http://localhost:8000/user-service/member/login" style="color:#1B8EF8; font-weight:600;">로그인</a>이 필요합니다.
         </div>
 
         <!-- 댓글 목록 -->
@@ -264,10 +263,11 @@
 
                         <!-- 댓글 수정 폼 -->
                         <div th:id="'comment-edit-' + ${comment.commentId}" class="comment-edit-wrap">
-                            <form th:action="@{/community/comment/edit}" method="post"
-                            	onsubmit="return confirm('수정하시겠습니까?')">
+                            <form action="http://localhost:8000/board-service/community/comment/edit" method="post"
+                                  onsubmit="return confirm('수정하시겠습니까?')">
                                 <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                 <input type="hidden" name="postId" th:value="${post.postId}">
+                                <input type="hidden" name="boardId" th:value="${post.boardId}">
                                 <textarea rows="3" name="content" th:text="${comment.content}" required></textarea>
                                 <div class="comment-edit-footer">
                                     <button type="button" class="reply-cancel"
@@ -285,18 +285,19 @@
                                   th:if="${#authentication.name == comment.memberId}">
                                 <button class="comment-action-btn"
                                         th:onclick="|toggleCommentEdit(${comment.commentId}, true)|">수정</button>
-                                <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
+                                <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
                                       onsubmit="return confirm('삭제하시겠습니까?')">
                                     <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                     <input type="hidden" name="postId" th:value="${post.postId}">
+                                    <input type="hidden" name="boardId" th:value="${post.boardId}">
                                     <button type="submit" class="comment-action-btn danger">삭제</button>
                                 </form>
                             </span>
 
-							<button class="comment-action-btn"
-							        th:data-id="${comment.commentId}"
-							        th:data-label="${comment.memberId}"
-							        onclick="openReport(3, this.dataset.id, this.dataset.label + '의 댓글')">
+                            <button class="comment-action-btn"
+                                    th:data-id="${comment.commentId}"
+                                    th:data-label="${comment.memberId}"
+                                    onclick="openReport(3, this.dataset.id, this.dataset.label + '의 댓글')">
                                 🚨 신고
                             </button>
                         </div>
@@ -317,17 +318,18 @@
                             <div class="comment-actions">
                                 <span sec:authorize="isAuthenticated()"
                                       th:if="${#authentication.name == reply.memberId}">
-                                    <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
+                                    <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
                                           onsubmit="return confirm('삭제하시겠습니까?')">
                                         <input type="hidden" name="commentId" th:value="${reply.commentId}">
                                         <input type="hidden" name="postId" th:value="${post.postId}">
+                                        <input type="hidden" name="boardId" th:value="${post.boardId}">
                                         <button type="submit" class="comment-action-btn danger">삭제</button>
                                     </form>
                                 </span>
-								<button class="comment-action-btn"
-								        th:data-id="${reply.commentId}"
-								        th:data-label="${reply.memberId}"
-								        onclick="openReport(3, this.dataset.id, this.dataset.label + '의 대댓글')">
+                                <button class="comment-action-btn"
+                                        th:data-id="${reply.commentId}"
+                                        th:data-label="${reply.memberId}"
+                                        onclick="openReport(3, this.dataset.id, this.dataset.label + '의 대댓글')">
                                     🚨 신고
                                 </button>
                             </div>
@@ -337,10 +339,11 @@
 
                 <!-- 대댓글 작성 폼 -->
                 <div class="reply-form-wrap" th:id="'reply-form-' + ${comment.commentId}" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/community/comment}" method="post"
-					      onsubmit="return confirm('대댓글을 등록하시겠습니까?')">
-					    <input type="hidden" name="postId" th:value="${post.postId}">
-					    <input type="hidden" name="parentCommentId" th:value="${comment.commentId}">
+                    <form action="http://localhost:8000/board-service/community/comment" method="post"
+                          onsubmit="return confirm('대댓글을 등록하시겠습니까?')">
+                        <input type="hidden" name="postId" th:value="${post.postId}">
+                        <input type="hidden" name="boardId" th:value="${post.boardId}">
+                        <input type="hidden" name="parentCommentId" th:value="${comment.commentId}">
                         <textarea rows="2" name="content" placeholder="대댓글을 입력하세요..." required></textarea>
                         <div class="reply-form-footer">
                             <button type="button" class="reply-cancel"
@@ -355,13 +358,13 @@
         <!-- 댓글 페이지네이션 -->
         <div class="comment-pagination"
              th:if="${commentTotalPages != null and commentTotalPages > 1}">
-            <a th:href="@{/community/view(postId=${post.postId},commentPage=1)}"
+            <a th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=1)}"
                th:classappend="${commentPage == 1} ? 'disabled'">◀</a>
             <a th:each="i : ${#numbers.sequence(1, commentTotalPages)}"
-               th:href="@{/community/view(postId=${post.postId},commentPage=${i})}"
+               th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=${i})}"
                th:text="${i}"
                th:classappend="${i == commentPage} ? 'active'"></a>
-            <a th:href="@{/community/view(postId=${post.postId},commentPage=${commentTotalPages})}"
+            <a th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=${commentTotalPages})}"
                th:classappend="${commentPage == commentTotalPages} ? 'disabled'">▶</a>
         </div>
     </div>
@@ -374,10 +377,11 @@
         <div class="modal-subtitle">허위 신고 시 서비스 이용이 제한될 수 있습니다.</div>
         <div class="modal-target">신고 대상: <strong id="reportTargetLabel">-</strong></div>
 
-        <form th:action="@{/community/report}" method="post" id="reportForm">
+        <form action="http://localhost:8000/board-service/community/report" method="post" id="reportForm">
             <input type="hidden" name="targetType" id="reportTargetType">
             <input type="hidden" name="targetId" id="reportTargetId">
-			<input type="hidden" name="postId" th:value="${post.postId}">
+            <input type="hidden" name="postId" th:value="${post.postId}">
+            <input type="hidden" name="boardId" th:value="${post.boardId}">
 
             <label>신고 유형</label>
             <ul class="reason-list">
@@ -387,7 +391,6 @@
                         <span th:text="${reason.reasonName}">신고유형</span>
                     </label>
                 </li>
-                <!-- reportReasons가 없을 때 기본 표시 -->
                 <li th:if="${reportReasons == null or #lists.isEmpty(reportReasons)}">
                     <label><input type="radio" name="reasonId" value="1" required> 스팸/광고</label>
                 </li>
@@ -418,18 +421,18 @@
 </div>
 
 <script>
-   
     function closeReport() {
-    	const overlay = document.getElementById('reportModal');
-        overlay.style.cssText = 'display:none !important;';  // ← 수정
+        const overlay = document.getElementById('reportModal');
+        overlay.style.cssText = 'display:none !important;';
         document.getElementById('reportForm').reset();
     }
-	const reportModal = document.getElementById('reportModal');
-	if (reportModal) {
-	    reportModal.addEventListener('click', function(e) {
-	        if (e.target === this) closeReport();
-	    });
-	}
+
+    const reportModal = document.getElementById('reportModal');
+    if (reportModal) {
+        reportModal.addEventListener('click', function(e) {
+            if (e.target === this) closeReport();
+        });
+    }
 
     function toggleReplyForm(commentId) {
         const el = document.getElementById('reply-form-' + commentId);
@@ -439,7 +442,6 @@
     function toggleCommentEdit(commentId, show) {
         const textEl = document.getElementById('comment-text-' + commentId);
         const editEl = document.getElementById('comment-edit-' + commentId);
-        
         const actionsEl = document.getElementById('comment-actions-' + commentId);
         if (show) {
             textEl.style.display = 'none';
@@ -456,55 +458,51 @@
         const titleView = document.getElementById('postTitleView');
         const contentView = document.getElementById('postContentView');
         const editWrap = document.getElementById('editPostWrap');
-        const metaActions = document.getElementById('postMetaActions'); // ← 추가
+        const metaActions = document.getElementById('postMetaActions');
 
         if (show) {
             titleView.style.display = 'none';
             contentView.style.display = 'none';
             editWrap.classList.add('show');
-            if (metaActions) metaActions.style.display = 'none';   // ← 추가
+            if (metaActions) metaActions.style.display = 'none';
         } else {
             titleView.style.display = 'block';
             contentView.style.display = 'block';
             editWrap.classList.remove('show');
-            if (metaActions) metaActions.style.display = 'flex';   // ← 추가
+            if (metaActions) metaActions.style.display = 'flex';
         }
     }
-	
-	// 기존 코드 위에 추가
-	document.addEventListener('DOMContentLoaded', function() {
-	    const modal = document.getElementById('reportModal');
-	    if (modal) {
-	        document.body.appendChild(modal);  // body 직접 붙이기
-	    }
-	    
-	    document.getElementById('reportForm').addEventListener('submit', function(e) {
-		    const reasonSelected = document.querySelector('input[name="reasonId"]:checked');
-		    if (!reasonSelected) {
-		        e.preventDefault();
-		        alert('신고 유형을 선택해주세요.');
-		        return;
-		    }
-		    
-		    if (!confirm('신고를 접수하시겠습니까?')) {
-		        e.preventDefault();
-		    }
-		});
-	});
-	
-	function openReport(targetType, targetId, label) {
-	    document.getElementById('reportTargetType').value = targetType;
-	    document.getElementById('reportTargetId').value = targetId;
-	    document.getElementById('reportTargetLabel').textContent = label;
-	    
-	    const overlay = document.getElementById('reportModal');
-	    overlay.style.cssText = 'display:flex !important; position:fixed !important; inset:0 !important; background:rgba(0,0,0,0.5) !important; z-index:99999 !important; align-items:center !important; justify-content:center !important;';
-	    
-	    const modal = overlay.querySelector('.modal');
-	    modal.style.cssText = 'display:block !important; background:white !important; border-radius:16px !important; padding:32px !important; width:460px !important; max-width:95vw !important; position:relative !important; z-index:100000 !important;';
-	}
 
-	
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('reportModal');
+        if (modal) {
+            document.body.appendChild(modal);
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            const reasonSelected = document.querySelector('input[name="reasonId"]:checked');
+            if (!reasonSelected) {
+                e.preventDefault();
+                alert('신고 유형을 선택해주세요.');
+                return;
+            }
+            if (!confirm('신고를 접수하시겠습니까?')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    function openReport(targetType, targetId, label) {
+        document.getElementById('reportTargetType').value = targetType;
+        document.getElementById('reportTargetId').value = targetId;
+        document.getElementById('reportTargetLabel').textContent = label;
+
+        const overlay = document.getElementById('reportModal');
+        overlay.style.cssText = 'display:flex !important; position:fixed !important; inset:0 !important; background:rgba(0,0,0,0.5) !important; z-index:99999 !important; align-items:center !important; justify-content:center !important;';
+
+        const modal = overlay.querySelector('.modal');
+        modal.style.cssText = 'display:block !important; background:white !important; border-radius:16px !important; padding:32px !important; width:460px !important; max-width:95vw !important; position:relative !important; z-index:100000 !important;';
+    }
 </script>
 </section>
 </body>

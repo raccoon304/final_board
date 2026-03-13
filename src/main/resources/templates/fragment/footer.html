@@ -1,6 +1,4 @@
-
 <!--/* Fragment 코드 */-->
-
 <footer xmlns:th="http://www.thymeleaf.org"
         th:fragment="footer" class="jp-footer">
   <div class="container-fluid jp-container">
@@ -18,10 +16,10 @@
       <div class="col-md-3 mb-4">
         <h6 class="jp-footer__subtitle">서비스</h6>
         <ul class="jp-footer__list">
-          <li><a th:href="@{/job/list}">채용정보</a></li>
-          <li><a th:href="@{/company/list}">기업정보</a></li>
-          <li><a th:href="@{/community}">커뮤니티</a></li>
-          <li><a th:href="@{/resume}">이력서 작성</a></li>
+          <li><a href="http://localhost:8000/user-service/job/list">채용정보</a></li>
+          <li><a href="http://localhost:8000/user-service/companyinfo/list">기업정보</a></li>
+          <li><a href="http://localhost:8000/board-service/community">커뮤니티</a></li>
+          <li><a href="http://localhost:8000/user-service/jobseeker/resume/list">이력서 작성</a></li>
         </ul>
       </div>
 
@@ -29,9 +27,9 @@
       <div class="col-md-3 mb-4">
         <h6 class="jp-footer__subtitle">고객센터</h6>
         <ul class="jp-footer__list">
-          <li><a th:href="@{/notice}">공지사항</a></li>
-          <li><a th:href="@{/faq}">자주 묻는 질문</a></li>
-          <li><a th:href="@{/inquiry}">1:1 문의</a></li>
+          <li><a href="http://localhost:8000/user-service/notice">공지사항</a></li>
+          <li><a href="http://localhost:8000/user-service/faq">자주 묻는 질문</a></li>
+          <li><a href="http://localhost:8000/user-service/inquiry">1:1 문의</a></li>
           <li class="jp-footer__muted">고객센터: 1234-5678</li>
           <li class="jp-footer__muted">평일 09:00 - 18:00</li>
         </ul>
@@ -41,10 +39,10 @@
       <div class="col-md-3 mb-4">
         <h6 class="jp-footer__subtitle">정책</h6>
         <ul class="jp-footer__list">
-          <li><a th:href="@{/policy/terms}">이용약관</a></li>
-          <li><a th:href="@{/policy/privacy}" class="font-weight-bold">개인정보처리방침</a></li>
-          <li><a th:href="@{/policy/recruit-terms}">채용서비스 이용약관</a></li>
-          <li><a th:href="@{/ad/inquiry}">광고문의</a></li>
+          <li><a href="http://localhost:8000/user-service/policy/terms">이용약관</a></li>
+          <li><a href="http://localhost:8000/user-service/policy/privacy" class="font-weight-bold">개인정보처리방침</a></li>
+          <li><a href="http://localhost:8000/user-service/policy/recruit-terms">채용서비스 이용약관</a></li>
+          <li><a href="http://localhost:8000/user-service/ad/inquiry">광고문의</a></li>
         </ul>
       </div>
     </div>
@@ -52,13 +50,12 @@
     <div class="jp-footer__bottom d-flex justify-content-between align-items-center py-3">
       <div class="jp-footer__copy">© 2026 잡파인더. All rights reserved.</div>
       <div class="jp-footer__links">
-        <a th:href="@{/policy/email-no-collect}">이메일 무단수집거부</a>
+        <a href="http://localhost:8000/user-service/policy/email-no-collect">이메일 무단수집거부</a>
         <span class="mx-2">·</span>
-        <a th:href="@{/guide}">이용안내</a>
+        <a href="http://localhost:8000/user-service/guide">이용안내</a>
         <span class="mx-2">·</span>
-        <a th:href="@{/company/info}">사업자정보</a>
+        <a href="http://localhost:8000/user-service/company/info">사업자정보</a>
       </div>
     </div>
   </div>
 </footer>
-

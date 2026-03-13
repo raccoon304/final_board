@@ -1,18 +1,12 @@
 <!--/* Fragment 코드 */-->
 <header xmlns:th="http://www.thymeleaf.org"
-        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         th:fragment="main_header"
         class="jp-header">
-
-  <div style="background:red; color:white; text-align:center; padding:6px; font-size:12px;">
-    BOARD-SERVICE HEADER TEST
-  </div>
 
   <script>
     function moveAfterRead(event, notiId, url) {
       event.preventDefault();
-
-      fetch('/finalProject/notification/api/read/' + notiId, {
+      fetch('http://localhost:8000/user-service/finalProject/notification/api/read/' + notiId, {
         method: 'POST'
       })
       .catch(() => {})
@@ -23,10 +17,8 @@
           if (count > 1) badge.innerText = count - 1;
           else badge.style.display = "none";
         }
-
         window.location.href = url;
       });
-
       return false;
     }
 
@@ -34,6 +26,8 @@
       if (window.JPAuth && typeof window.JPAuth.clearAccessToken === 'function') {
         window.JPAuth.clearAccessToken();
       }
+      localStorage.removeItem('loginUser');
+      sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('refreshToken');
       return true;
     }
@@ -42,8 +36,11 @@
       const msaGuestMenu = document.getElementById('msaGuestMenu');
       const msaUserMenu = document.getElementById('msaUserMenu');
       const msaLoginMemberId = document.getElementById('msaLoginMemberId');
+      const msaAdminMenu = document.getElementById('msaAdminMenu');
+      const msaCompanyMenu = document.getElementById('msaCompanyMenu');
+      const msaMemberMenu = document.getElementById('msaMemberMenu');
 
-      if (!msaGuestMenu || !msaUserMenu || !msaLoginMemberId) return;
+      if (!msaGuestMenu || !msaUserMenu) return;
 
       let loginUser = null;
       const loginUserRaw = localStorage.getItem('loginUser');
@@ -58,9 +55,18 @@
       }
 
       if (loginUser && accessToken) {
-        msaLoginMemberId.textContent = loginUser.memberid || loginUser.name || '회원';
+        if (msaLoginMemberId) {
+          msaLoginMemberId.textContent = loginUser.memberid || loginUser.name || '회원';
+        }
         msaGuestMenu.classList.add('d-none');
         msaUserMenu.classList.remove('d-none');
+
+        // 권한별 메뉴
+        const role = loginUser.role || '';
+        if (msaAdminMenu && role.includes('ADMIN')) msaAdminMenu.classList.remove('d-none');
+        if (msaCompanyMenu && role.includes('COMPANY')) msaCompanyMenu.classList.remove('d-none');
+        if (msaMemberMenu && role.includes('MEMBER')) msaMemberMenu.classList.remove('d-none');
+
       } else {
         msaGuestMenu.classList.remove('d-none');
         msaUserMenu.classList.add('d-none');
@@ -71,7 +77,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container-fluid jp-container">
 
-      <a class="navbar-brand d-flex align-items-center jp-brand" th:href="@{/}">
+      <a class="navbar-brand d-flex align-items-center jp-brand" href="http://localhost:8000/user-service/">
         <span class="jp-brand__icon">
           <i class="fa-solid fa-magnifying-glass"></i>
         </span>
@@ -85,134 +91,53 @@
 
       <div class="collapse navbar-collapse" id="jpNav">
         <ul class="navbar-nav mr-auto jp-nav">
-          <li class="nav-item"><a class="nav-link" th:href="@{/job/list}">채용정보</a></li>
-          <li class="nav-item"><a class="nav-link" th:href="@{/companyinfo/list}">기업정보</a></li>
-
-          <li class="nav-item">
-            <a class="nav-link" th:href="@{/community}">커뮤니티</a>
-          </li>
-
-          <li class="nav-item"><a class="nav-link" th:href="@{/notice}">공지사항</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/job/list">채용정보</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/companyinfo/list">기업정보</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/board-service/community">커뮤니티</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/notice">공지사항</a></li>
         </ul>
 
         <div class="d-flex align-items-center jp-auth">
 
-          기존 서버 인증(th:sec) 영역
-          <th:block sec:authorize="isAnonymous()">
-            <a class="jp-auth__link" th:href="@{/member/login}">로그인</a>
-            <a class="btn btn-primary jp-auth__btn" th:href="@{/member/registerMember}">회원가입</a>
-          </th:block>
+          <!-- 로그인 전 -->
+          <div id="msaGuestMenu" class="d-none">
+            <a class="jp-auth__link" href="http://localhost:8000/user-service/member/login">로그인</a>
+            <a class="btn btn-primary jp-auth__btn ml-2" href="http://localhost:8000/user-service/member/registerMember">회원가입</a>
+          </div>
 
-		
-          
-          
-          
-          
-          
-          <th:block sec:authorize="isAuthenticated()">
+          <!-- 로그인 후 -->
+          <div id="msaUserMenu" class="d-none">
+            <div class="d-flex align-items-center">
 
-            <div class="dropdown mr-3" th:if="${notificationList != null}">
-              <button class="btn btn-link p-0 text-decoration-none dropdown-toggle"
-                      type="button"
-                      id="notificationDropdown"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      style="color:#6b7280; font-size:13px;">
-
-                <b class="jp-brand__text" sec:authentication="name"></b> 님
-
-                <span id="notificationBadge"
-                      class="badge badge-danger ml-1"
-                      th:if="${unreadNotificationCount > 0}"
-                      th:text="${unreadNotificationCount}"
-                      style="font-size:11px;">
-                  0
-                </span>
-              </button>
-
-              <div class="dropdown-menu dropdown-menu-right p-0"
-                   aria-labelledby="notificationDropdown"
-                   style="min-width:360px; max-width:360px; border-radius:12px; overflow:hidden;">
-
-                <div class="px-3 py-2 font-weight-bold border-bottom">
-                  알림
-                </div>
-
-                <div th:if="${#lists.isEmpty(notificationList)}"
-                     class="px-3 py-3 text-muted"
-                     style="font-size:13px;">
-                  알림이 없습니다.
-                </div>
-
-                <a th:each="noti : ${notificationList}"
-                   th:href="@{${noti.linkUrl}}"
-                   th:onclick="'return moveAfterRead(event, ' + ${noti.notiId} + ', this.href)'"
-                   th:class="'dropdown-item px-3 py-3 border-bottom ' + (${noti.isRead} == 1 ? 'text-muted bg-light' : '')"
-                   style="white-space:normal; line-height:1.5;">
-
-                  <div style="font-weight:600; font-size:14px; color:#111827;"
-                       th:text="${noti.title}">
-                    알림 제목
-                  </div>
-
-                  <div style="font-size:12px; color:#6b7280; white-space:pre-wrap;"
-                       th:text="${noti.message}">
-                    알림 내용
-                  </div>
-                </a>
-
+              <div class="mr-3 text-muted" style="font-size:13px;">
+                <b class="jp-brand__text" id="msaLoginMemberId"></b> 님
               </div>
-            </div>
 
-            <div class="mr-3 text-muted" style="font-size:13px;" th:if="${notificationList == null}">
-              <b class="jp-brand__text" sec:authentication="name"></b> 님
-            </div>
+              <!-- 관리자 -->
+              <div id="msaAdminMenu" class="d-none">
+                <a class="jp-auth__link" href="http://localhost:8000/user-service/admin/admin_dashboard">관리자</a>
+              </div>
 
-            <th:block sec:authorize="hasRole('ADMIN')">
-              <a class="jp-auth__link" th:href="@{/admin/admin_dashboard}">관리자</a>
-            </th:block>
+              <!-- 기업 -->
+              <div id="msaCompanyMenu" class="d-none">
+                <a class="jp-auth__link" href="http://localhost:8000/user-service/company/company_dashboard">기업페이지</a>
+              </div>
 
-            <th:block sec:authorize="hasRole('COMPANY')">
-              <a class="jp-auth__link" th:href="@{/company/company_dashboard}">기업페이지</a>
-            </th:block>
-
-            <th:block sec:authorize="hasRole('MEMBER')">
-              <a class="jp-auth__link" th:href="@{/jobseeker/dashboard}">마이페이지</a>
-            </th:block>
-
-            <form th:action="@{/security/logout}" method="post" class="m-0 ml-2" onsubmit="return handleLogout();">
-              <button type="submit" class="jp-auth__link btn btn-link p-0">로그아웃</button>
-            </form>
-          </th:block>
-
-          <!-- MSA 테스트용 영역 -->
-          <div class="ml-4 pl-3 border-left" style="border-color:#e5e7eb !important;">
-            <div class="text-muted mb-1" style="font-size:11px;">MSA 테스트용 표시</div>
-
-            <div id="msaGuestMenu">
-              <a class="jp-auth__link" href="http://localhost:8000/user-service/member/login">로그인</a>
-              <a class="btn btn-outline-primary jp-auth__btn ml-2" href="http://localhost:8000/user-service/member/registerMember">회원가입</a>
-            </div>
-
-            <div id="msaUserMenu" class="d-none">
-              <div class="d-flex align-items-center">
-                <div class="mr-3 text-muted" style="font-size:13px;">
-                  <b class="jp-brand__text" id="msaLoginMemberId"></b> 님
-                </div>
-
+              <!-- 개인 -->
+              <div id="msaMemberMenu" class="d-none">
                 <a class="jp-auth__link" href="http://localhost:8000/user-service/jobseeker/dashboard">마이페이지</a>
-
-                <form action="http://localhost:8000/user-service/security/logout" method="post" class="m-0 ml-2" onsubmit="return handleLogout();">
-                  <button type="submit" class="jp-auth__link btn btn-link p-0">로그아웃</button>
-                </form>
               </div>
+
+              <!-- 로그아웃 -->
+              <form action="http://localhost:8000/user-service/security/logout" method="post" class="m-0 ml-2" onsubmit="return handleLogout();">
+                <button type="submit" class="jp-auth__link btn btn-link p-0">로그아웃</button>
+              </form>
+
             </div>
           </div>
 
         </div>
       </div>
-
     </div>
   </nav>
 </header>

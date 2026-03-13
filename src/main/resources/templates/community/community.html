@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::section})}"
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script[name='scripts']}, ~{::section})}"
       lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
@@ -37,7 +37,6 @@
             display: grid; grid-template-columns: 240px 1fr 300px; gap: 24px;
         }
 
-        /* 좌측 사이드바 */
         .sidebar-left { height: fit-content; position: sticky; top: 90px; }
         .category-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 24px; }
         .category-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #333; }
@@ -52,9 +51,8 @@
         .category-list li a.active { background: #E3F2FF; color: #1B8EF8; font-weight: 600; }
         .category-count { font-size: 13px; color: #999; font-weight: 500; }
 
-        /* 메인 영역 */
         .content-main { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 32px; }
-        .content-header { display: flex; justify-content: flex-end;  /* space-between → flex-end */ align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .content-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
 
         .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
         .filter-tabs a { padding: 8px 16px; border: 1px solid #E0E0E0; background: white; border-radius: 20px; font-size: 14px; font-weight: 500; color: #666; cursor: pointer; transition: all 0.3s; text-decoration: none; }
@@ -79,7 +77,6 @@
         }
         .write-button:hover { background: #0D6FD8; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27,142,248,0.3); }
 
-        /* 게시글 리스트 */
         .post-list { list-style: none; }
         .post-item { padding: 24px 0; border-bottom: 1px solid #F0F0F0; transition: all 0.3s; cursor: pointer; }
         .post-item:last-child { border-bottom: none; }
@@ -87,11 +84,11 @@
         .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 
         .category-badge { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; color: white; }
-		.badge-1 { background: red }        
-		.badge-2 { background: orange }          
-		.badge-3 { background: skyblue; }  
-		.badge-4 { background: navy; } 
-		.badge-5 { background: purple; } 
+        .badge-1 { background: red }
+        .badge-2 { background: orange }
+        .badge-3 { background: skyblue; }
+        .badge-4 { background: navy; }
+        .badge-5 { background: purple; }
 
         .hot-badge {
             padding: 4px 8px; background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
@@ -103,7 +100,6 @@
         .post-stats { display: flex; gap: 12px; }
         .post-stats span { display: flex; align-items: center; gap: 4px; }
 
-        /* 우측 사이드바 */
         .sidebar-right { height: fit-content; position: sticky; top: 90px; display: flex; flex-direction: column; gap: 24px; }
         .widget { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 24px; }
         .widget h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #333; }
@@ -119,14 +115,12 @@
         .tag { padding: 6px 14px; background: #F5F7FA; border: 1px solid #E0E0E0; border-radius: 20px; font-size: 13px; color: #666; cursor: pointer; transition: all 0.3s; }
         .tag:hover { background: #E3F2FF; color: #1B8EF8; border-color: #1B8EF8; }
 
-        /* 페이지네이션 */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 40px; }
         .pagination a { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #E0E0E0; background: white; border-radius: 8px; font-size: 14px; color: #666; text-decoration: none; transition: all 0.3s; }
         .pagination a:hover { border-color: #1B8EF8; color: #1B8EF8; }
         .pagination a.active { background: #1B8EF8; color: white; border-color: #1B8EF8; }
         .pagination a.disabled { opacity: 0.3; pointer-events: none; }
 
-        /* 빈 목록 */
         .empty-msg { text-align: center; padding: 60px 0; color: #9ca3af; font-size: 15px; }
 
         @media (max-width: 1200px) {
@@ -139,12 +133,6 @@
             .community-header h1 { font-size: 32px; }
         }
     </style>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // 나중에 서버 데이터 바인딩 시 사용
-        /*]]>*/
-    </script>
 </head>
 
 <body>
@@ -155,7 +143,7 @@
         <h1>💬 커뮤니티</h1>
         <p>취업 준비부터 직장 생활까지, 함께 이야기해요</p>
         <div class="search-container">
-            <form th:action="@{/community}" method="get">
+            <form action="http://localhost:8000/board-service/community" method="get">
                 <input type="hidden" name="boardId" th:value="${currentBoardId}">
                 <input type="text" name="search" th:value="${param.search}" placeholder="궁금한 내용을 검색해보세요...">
                 <button type="submit">검색</button>
@@ -172,13 +160,13 @@
                 <h3>카테고리</h3>
                 <ul class="category-list">
                     <li>
-                        <a th:href="@{/community}"
+                        <a href="http://localhost:8000/board-service/community"
                            th:classappend="${currentBoardId == null} ? 'active'">
                             📋 전체글
                         </a>
                     </li>
                     <li th:each="board : ${boards}">
-                        <a th:href="@{/community(boardId=${board.boardId})}"
+                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${board.boardId})}"
                            th:classappend="${currentBoardId == board.boardId} ? 'active'">
                             <span th:text="${board.title}"></span>
                             <span class="category-count" th:text="${board.postCount}"></span>
@@ -191,100 +179,90 @@
         <!-- 메인 영역 -->
         <main class="content-main">
             <div class="content-header">
-
-                <!-- 상단 탭 필터 -->
-				
-
                <div class="content-actions" style="margin-left: auto;">
-                    <!-- 정렬 -->
                     <div class="sort-buttons">
-                        <a th:href="@{/community(boardId=${currentBoardId},sort='latest')}"
+                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='latest')}"
                            th:classappend="${sort == 'latest' or sort == null} ? 'active'">최신순</a>
-                        <a th:href="@{/community(boardId=${currentBoardId},sort='popular')}"
+                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='popular')}"
                            th:classappend="${sort == 'popular'} ? 'active'">인기순</a>
-                        <a th:href="@{/community(boardId=${currentBoardId},sort='comments')}"
+                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='comments')}"
                            th:classappend="${sort == 'comments'} ? 'active'">댓글순</a>
                     </div>
-                    <!-- 글쓰기 버튼 (로그인 시에만) -->
                     <a sec:authorize="isAuthenticated()"
-                       th:href="@{/community/write(boardId=${currentBoardId})}"
+                       th:href="@{'http://localhost:8000/board-service/community/write'(boardId=${currentBoardId})}"
                        class="write-button">✏️ 글쓰기</a>
                 </div>
             </div>
 
-           
             <!-- 게시글 목록 -->
-			<table style="width:100%; border-collapse:collapse;">
-			    <thead>
-			        <tr style="border-bottom: 2px solid #E0E0E0; font-size:13px; color:#999;">
-			            <th style="padding:12px 8px; text-align:center; width:60px;">번호</th>
-			            <th style="padding:12px 8px; text-align:center; width:100px;">게시판</th>  <!-- 추가 -->
-			            <th style="padding:12px 8px; text-align:left;">제목</th>
-			            <th style="padding:12px 8px; text-align:center; width:100px;">작성자</th>
-			            <th style="padding:12px 8px; text-align:center; width:80px;">날짜</th>
-			            <th style="padding:12px 8px; text-align:center; width:60px;">조회</th>
-			            <th style="padding:12px 8px; text-align:center; width:60px;">댓글</th>
-			        </tr>
-			    </thead>
-			    <tbody>
-			        <tr th:if="${#lists.isEmpty(posts)}">
-			            <td colspan="7" style="text-align:center; padding:60px 0; color:#9ca3af;">
-			                게시글이 없습니다.
-			            </td>
-			        </tr>
-					<tr th:each="post, postStat : ${posts}"
-					    th:onclick="|location.href='@{/community/view(postId=${post.postId})}'|"
-					    style="border-bottom:1px solid #F0F0F0; cursor:pointer; transition: background 0.2s;"
-					    onmouseover="this.style.background='#F9FBFD'"
-					    onmouseout="this.style.background='white'">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E0E0E0; font-size:13px; color:#999;">
+                        <th style="padding:12px 8px; text-align:center; width:60px;">번호</th>
+                        <th style="padding:12px 8px; text-align:center; width:100px;">게시판</th>
+                        <th style="padding:12px 8px; text-align:left;">제목</th>
+                        <th style="padding:12px 8px; text-align:center; width:100px;">작성자</th>
+                        <th style="padding:12px 8px; text-align:center; width:80px;">날짜</th>
+                        <th style="padding:12px 8px; text-align:center; width:60px;">조회</th>
+                        <th style="padding:12px 8px; text-align:center; width:60px;">댓글</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(posts)}">
+                        <td colspan="7" style="text-align:center; padding:60px 0; color:#9ca3af;">
+                            게시글이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="post, postStat : ${posts}"
+                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|"
+                        style="border-bottom:1px solid #F0F0F0; cursor:pointer; transition: background 0.2s;"
+                        onmouseover="this.style.background='#F9FBFD'"
+                        onmouseout="this.style.background='white'">
 
-			            <!-- 번호: 페이지 기준 순번 -->
-			            <td style="padding:14px 8px; text-align:center; font-size:13px; color:#999;"
-			                th:text="${(currentPage - 1) * pageSize + postStat.count}"></td>
+                        <td style="padding:14px 8px; text-align:center; font-size:13px; color:#999;"
+                            th:text="${(currentPage - 1) * pageSize + postStat.count}"></td>
 
-			            <!-- 게시판명 컬럼 (별도 분리) -->
-			            <td style="padding:14px 8px; text-align:center;">
-			                <span th:class="'category-badge badge-' + ${(post.boardId % 5 == 0) ? 5 : (post.boardId % 5)}"
-     							 th:text="${post.boardTitle}"></span>
-			            </td>
+                        <td style="padding:14px 8px; text-align:center;">
+                            <span th:class="'category-badge badge-' + ${(post.boardId % 5 == 0) ? 5 : (post.boardId % 5)}"
+                                  th:text="${post.boardTitle}"></span>
+                        </td>
 
-			            <!-- 제목 (뱃지 제거, 순수 제목만) -->
-			            <td style="padding:14px 8px;">
-			                <div style="display:flex; align-items:center; gap:8px;">
-			                    <span style="font-size:15px; font-weight:500; color:#333;"
-			                          th:text="${post.title}"></span>
-			                    <span style="padding:2px 6px; background:#FF5252; color:white;
-			                                 border-radius:4px; font-size:11px; font-weight:700;"
-			                          th:if="${post.viewCount >= 100}">HOT</span>
-			                </div>
-			            </td>
+                        <td style="padding:14px 8px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:15px; font-weight:500; color:#333;"
+                                      th:text="${post.title}"></span>
+                                <span style="padding:2px 6px; background:#FF5252; color:white;
+                                             border-radius:4px; font-size:11px; font-weight:700;"
+                                      th:if="${post.viewCount >= 100}">HOT</span>
+                            </div>
+                        </td>
 
-			            <td style="padding:14px 8px; text-align:center; font-size:13px; color:#666;"
-			                th:text="${post.memberId}"></td>
+                        <td style="padding:14px 8px; text-align:center; font-size:13px; color:#666;"
+                            th:text="${post.memberId}"></td>
 
-			            <td style="padding:14px 8px; text-align:center; font-size:12px; color:#999;"
-			                th:text="${#temporals.format(post.createdAt, 'MM-dd')}"></td>
+                        <td style="padding:14px 8px; text-align:center; font-size:12px; color:#999;"
+                            th:text="${#temporals.format(post.createdAt, 'MM-dd')}"></td>
 
-			            <td style="padding:14px 8px; text-align:center; font-size:13px; color:#999;"
-			                th:text="${post.viewCount}"></td>
+                        <td style="padding:14px 8px; text-align:center; font-size:13px; color:#999;"
+                            th:text="${post.viewCount}"></td>
 
-			            <td style="padding:14px 8px; text-align:center; font-size:13px; color:#1B8EF8;"
-			                th:text="${post.commentCount}"></td>
-			        </tr>
-			    </tbody>
-			</table>						
+                        <td style="padding:14px 8px; text-align:center; font-size:13px; color:#1B8EF8;"
+                            th:text="${post.commentCount}"></td>
+                    </tr>
+                </tbody>
+            </table>
 
             <!-- 페이지네이션 -->
             <div class="pagination">
-                <a th:href="@{/community(boardId=${currentBoardId},page=1,sort=${sort},search=${param.search})}"
+                <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=1,sort=${sort},search=${param.search})}"
                    th:classappend="${currentPage == 1} ? 'disabled'">◀</a>
 
                 <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-                   th:href="@{/community(boardId=${currentBoardId},page=${i},sort=${sort},search=${param.search})}"
+                   th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=${i},sort=${sort},search=${param.search})}"
                    th:text="${i}"
                    th:classappend="${i == currentPage} ? 'active'"></a>
 
-                <a th:href="@{/community(boardId=${currentBoardId},page=${totalPages},sort=${sort},search=${param.search})}"
+                <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=${totalPages},sort=${sort},search=${param.search})}"
                    th:classappend="${currentPage == totalPages} ? 'disabled'">▶</a>
             </div>
         </main>
@@ -292,35 +270,35 @@
         <!-- 우측 사이드바 -->
         <aside class="sidebar-right">
 
-		<!-- 로그인 유저 전용 위젯 -->
-		<div class="widget" sec:authorize="isAuthenticated()">
-		    <h3>👤 나의 활동</h3>
-		    <div style="display:flex; gap:8px; margin-bottom:16px;">
-		        <a th:href="@{/community(type='myposts')}"
-		           style="flex:1; text-align:center; padding:10px; background:#E3F2FF;
-		                  color:#1B8EF8; border-radius:8px; font-size:13px;
-		                  font-weight:600; text-decoration:none;">
-		            ✏️ 내가 쓴 글<br>
-		            <span style="font-size:18px; font-weight:700;"
-		                  th:text="${myPostCount}">0</span>
-		        </a>
-		        <a th:href="@{/community(type='mycomments')}"
-		           style="flex:1; text-align:center; padding:10px; background:#F0FFF4;
-		                  color:#27AE60; border-radius:8px; font-size:13px;
-		                  font-weight:600; text-decoration:none;">
-		            💬 댓글 단 글<br>
-		            <span style="font-size:18px; font-weight:700;"
-		                  th:text="${myCommentCount}">0</span>
-		        </a>
-		    </div>
-		</div>
+            <!-- 나의 활동 -->
+            <div class="widget" sec:authorize="isAuthenticated()">
+                <h3>👤 나의 활동</h3>
+                <div style="display:flex; gap:8px; margin-bottom:16px;">
+                    <a th:href="@{'http://localhost:8000/board-service/community'(type='myposts')}"
+                       style="flex:1; text-align:center; padding:10px; background:#E3F2FF;
+                              color:#1B8EF8; border-radius:8px; font-size:13px;
+                              font-weight:600; text-decoration:none;">
+                        ✏️ 내가 쓴 글<br>
+                        <span style="font-size:18px; font-weight:700;"
+                              th:text="${myPostCount}">0</span>
+                    </a>
+                    <a th:href="@{'http://localhost:8000/board-service/community'(type='mycomments')}"
+                       style="flex:1; text-align:center; padding:10px; background:#F0FFF4;
+                              color:#27AE60; border-radius:8px; font-size:13px;
+                              font-weight:600; text-decoration:none;">
+                        💬 댓글 단 글<br>
+                        <span style="font-size:18px; font-weight:700;"
+                              th:text="${myCommentCount}">0</span>
+                    </a>
+                </div>
+            </div>
 
             <!-- 인기 게시글 TOP 5 -->
             <div class="widget">
                 <h3>🔥 인기 게시글 TOP 5</h3>
                 <ul class="hot-posts-list">
                     <li class="hot-post-item" th:each="post, stat : ${hotPosts}"
-                        th:onclick="|location.href='@{/community/view(postId=${post.postId})}'|">
+                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|">
                         <div class="hot-rank" th:text="${stat.count}"></div>
                         <div class="hot-post-content">
                             <div class="hot-post-category" th:text="'[' + ${post.boardTitle} + ']'"></div>
@@ -330,26 +308,29 @@
                 </ul>
             </div>
 
+            <!-- 최근 7일 인기글 -->
             <div class="widget">
-				    <h3>🕐 최근 7일 인기글</h3>
-				    <ul class="hot-posts-list">
-				        <li class="hot-post-item" th:if="${#lists.isEmpty(recentHotPosts)}">
-				            <span style="color:#999; font-size:13px;">최근 인기글이 없습니다.</span>
-				        </li>
-				        <li class="hot-post-item" th:each="post, stat : ${recentHotPosts}"
-				            th:onclick="|location.href='@{/community/view(postId=${post.postId})}'|">
-				            <div class="hot-rank" th:text="${stat.count}"></div>
-				            <div class="hot-post-content">
-				                <div class="hot-post-title" th:text="${post.title}"></div>
-				                <div class="hot-post-category">👁️ <span th:text="${post.viewCount}"></span></div>
-				            </div>
-				        </li>
-				    </ul>
-				</div>
+                <h3>🕐 최근 7일 인기글</h3>
+                <ul class="hot-posts-list">
+                    <li class="hot-post-item" th:if="${#lists.isEmpty(recentHotPosts)}">
+                        <span style="color:#999; font-size:13px;">최근 인기글이 없습니다.</span>
+                    </li>
+                    <li class="hot-post-item" th:each="post, stat : ${recentHotPosts}"
+                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|">
+                        <div class="hot-rank" th:text="${stat.count}"></div>
+                        <div class="hot-post-content">
+                            <div class="hot-post-title" th:text="${post.title}"></div>
+                            <div class="hot-post-category">👁️ <span th:text="${post.viewCount}"></span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
         </aside>
     </div>
 
+	<script name="scripts"></script>
+	
 </section>
 </body>
 </html>
