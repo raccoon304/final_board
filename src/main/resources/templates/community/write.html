@@ -79,8 +79,6 @@
         }
         .btn-submit:hover { background: #0D6FD8; }
     </style>
-
-	
 </head>
 
 <body>
@@ -94,9 +92,6 @@
 
         <div class="write-card">
             <form th:action="@{/board-service/community/write}" method="post" onsubmit="return validateForm()">
-
-                <!-- CSRF 토큰 -->
-				
 
                 <!-- 카테고리 -->
                 <div class="form-group">
@@ -136,28 +131,43 @@
         </div>
 
     </div>
-	
-	
-	<script>
-		function validateForm() {
-		    const boardSelect = document.querySelector('select[name="boardId"]');
-		    const hiddenBoard = document.querySelector('input[name="boardId"]');
-		    const title = document.querySelector('input[name="title"]').value.trim();
-		    const content = document.querySelector('textarea[name="content"]').value.trim();
 
-		    const boardId = boardSelect ? boardSelect.value : hiddenBoard?.value;
+    <script>
+        /* ── 비로그인 접근 차단 (header.html 과 동일한 방식) ── */
+        (function () {
+            var loginUserRaw = sessionStorage.getItem('loginUser') || localStorage.getItem('loginUser');
+            var accessToken  = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+            var isLoggedIn   = false;
 
-		    if (!boardId || boardId === '') {
-		        alert('카테고리를 선택해주세요.');
-		        return false;
-		    }
-		    if (title === '') { alert('제목을 입력해주세요.'); return false; }
-		    if (content === '') { alert('내용을 입력해주세요.'); return false; }
+            if (loginUserRaw && accessToken) {
+                try {
+                    var loginUser = JSON.parse(loginUserRaw);
+                    if (loginUser) isLoggedIn = true;
+                } catch (e) {}
+            }
 
-		    return confirm('등록하시겠습니까?'); // 통과 시 form 제출
-		}
-		</script>
-	
+            if (!isLoggedIn) {
+                alert('로그인이 필요한 서비스입니다.');
+                location.href = 'http://localhost:8000/user-service/member/login';
+            }
+        })();
+
+        /* ── 폼 유효성 검사 ── */
+        function validateForm() {
+            var boardSelect  = document.querySelector('select[name="boardId"]');
+            var hiddenBoard  = document.querySelector('input[name="boardId"]');
+            var title   = document.querySelector('input[name="title"]').value.trim();
+            var content = document.querySelector('textarea[name="content"]').value.trim();
+            var boardId = boardSelect ? boardSelect.value : (hiddenBoard ? hiddenBoard.value : '');
+
+            if (!boardId || boardId === '') { alert('카테고리를 선택해주세요.'); return false; }
+            if (title === '')   { alert('제목을 입력해주세요.'); return false; }
+            if (content === '') { alert('내용을 입력해주세요.'); return false; }
+
+            return confirm('등록하시겠습니까?');
+        }
+    </script>
+
 </section>
 </body>
 </html>

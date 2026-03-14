@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script[name='scripts']}, ~{::section})}"
       lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org">
+<!--  sec:authorize 제거 — xmlns:sec 불필요 -->
 
 <head>
     <meta charset="UTF-8">
@@ -188,9 +188,12 @@
                         <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='comments')}"
                            th:classappend="${sort == 'comments'} ? 'active'">댓글순</a>
                     </div>
-                    <a sec:authorize="isAuthenticated()"
+
+                    <!-- ↓ sec:authorize 제거 → JS로 제어 (기본 hidden) -->
+                    <a id="writeBtnArea"
                        th:href="@{'http://localhost:8000/board-service/community/write'(boardId=${currentBoardId})}"
-                       class="write-button">✏️ 글쓰기</a>
+                       class="write-button"
+                       style="display:none;">✏️ 글쓰기</a>
                 </div>
             </div>
 
@@ -270,8 +273,8 @@
         <!-- 우측 사이드바 -->
         <aside class="sidebar-right">
 
-            <!-- 나의 활동 -->
-            <div class="widget" sec:authorize="isAuthenticated()">
+            <!-- 나의 활동 (기본 hidden → JS로 제어) -->
+            <div class="widget" id="myActivityWidget" style="display:none;">
                 <h3>👤 나의 활동</h3>
                 <div style="display:flex; gap:8px; margin-bottom:16px;">
                     <a th:href="@{'http://localhost:8000/board-service/community'(type='myposts')}"
@@ -329,8 +332,36 @@
         </aside>
     </div>
 
-	<script name="scripts"></script>
-	
+    <script name="scripts">
+        document.addEventListener('DOMContentLoaded', function () {
+
+            /* ── header.html 과 동일한 방식으로 로그인 여부 판단 ── */
+            var loginUserRaw = localStorage.getItem('loginUser');
+            var accessToken  = sessionStorage.getItem('accessToken');
+            var isLoggedIn   = false;
+
+            if (loginUserRaw && accessToken) {
+                try {
+                    var loginUser = JSON.parse(loginUserRaw);
+                    if (loginUser) isLoggedIn = true;
+                } catch (e) {
+                    isLoggedIn = false;
+                }
+            }
+
+            /* ── 로그인 상태에 따라 요소 표시/숨김 ── */
+            if (isLoggedIn) {
+                // 글쓰기 버튼 표시
+                var writeBtn = document.getElementById('writeBtnArea');
+                if (writeBtn) writeBtn.style.display = 'inline-flex';
+
+                // 나의 활동 위젯 표시
+                var myActivity = document.getElementById('myActivityWidget');
+                if (myActivity) myActivity.style.display = 'block';
+            }
+        });
+    </script>
+
 </section>
 </body>
 </html>

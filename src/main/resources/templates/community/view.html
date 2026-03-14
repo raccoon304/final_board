@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::section})}"
       lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org">
+<!-- sec:authorize 전부 제거 — xmlns:sec 불필요 -->
+
 <head>
     <meta charset="UTF-8">
     <title th:text="${post.title} + ' - 잡파인더'">게시글 - 잡파인더</title>
@@ -93,26 +94,9 @@
         .edit-post-wrap textarea { width: 100%; padding: 14px 16px; border: 1px solid #1B8EF8; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical; outline: none; min-height: 200px; }
         .edit-post-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-        }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; }
         .modal-overlay.show { display: flex; }
-        .modal {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            width: 460px;
-            max-width: 95vw;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 100000;
-        }
+        .modal { background: white; border-radius: 16px; padding: 32px; width: 460px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; z-index: 100000; }
         .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .modal-subtitle { font-size: 13px; color: #999; margin-bottom: 24px; }
         .modal-target { background: #F5F7FA; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #666; margin-bottom: 20px; }
@@ -175,12 +159,13 @@
             </form>
         </div>
 
-        <div class="post-meta">
+        <!-- ↓ data-author 로 작성자 심어두기, JS에서 본인 여부 판단 -->
+        <div class="post-meta" th:data-author="${post.memberId}">
             <span class="post-author" th:text="${post.memberId}">작성자</span>
             <span th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">날짜</span>
             <span>조회 <span th:text="${post.viewCount}">0</span></span>
-            <div class="post-meta-actions" id="postMetaActions" sec:authorize="isAuthenticated()"
-                 th:if="${#authentication.name == post.memberId}">
+            <!-- 수정/삭제 버튼: 기본 hidden → JS에서 본인이면 표시 -->
+            <div class="post-meta-actions" id="postMetaActions" style="display:none;">
                 <button class="btn-sm" onclick="toggleEditPost(true)">✏️ 수정</button>
                 <form action="http://localhost:8000/board-service/community/delete" method="post" style="display:inline;"
                       onsubmit="return confirm('삭제하시겠습니까?')">
@@ -224,8 +209,8 @@
             댓글 <span class="comment-count" th:text="${#lists.size(comments)}">0</span>
         </div>
 
-        <!-- 댓글 작성 -->
-        <div class="comment-form" sec:authorize="isAuthenticated()">
+        <!-- 댓글 작성 폼: 기본 hidden → JS에서 로그인이면 표시 -->
+        <div class="comment-form" id="commentFormArea" style="display:none;">
             <form action="http://localhost:8000/board-service/community/comment" method="post"
                   onsubmit="return confirm('댓글을 등록하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
@@ -236,7 +221,8 @@
                 </div>
             </form>
         </div>
-        <div sec:authorize="!isAuthenticated()"
+        <!-- 비로그인 안내: 기본 표시 → JS에서 로그인이면 숨김 -->
+        <div id="commentLoginNotice"
              style="padding:14px; background:#F5F7FA; border-radius:8px; text-align:center; font-size:14px; color:#999; margin-bottom:24px;">
             댓글을 작성하려면 <a href="http://localhost:8000/user-service/member/login" style="color:#1B8EF8; font-weight:600;">로그인</a>이 필요합니다.
         </div>
@@ -248,7 +234,12 @@
                 첫 번째 댓글을 작성해보세요!
             </li>
 
-            <li class="comment-item" th:each="comment : ${comments}" th:id="'comment-' + ${comment.commentId}">
+            <!-- ↓ data-author 로 댓글 작성자 심어두기 -->
+            <li class="comment-item"
+                th:each="comment : ${comments}"
+                th:id="'comment-' + ${comment.commentId}"
+                th:data-author="${comment.memberId}">
+
                 <div class="comment-top">
                     <div class="comment-avatar" th:text="${#strings.substring(comment.memberId, 0, 1)}">A</div>
                     <div class="comment-body">
@@ -278,11 +269,12 @@
                         </div>
 
                         <div class="comment-actions" th:id="'comment-actions-' + ${comment.commentId}">
-                            <button class="comment-action-btn" sec:authorize="isAuthenticated()"
+                            <!-- 답글 버튼: 기본 hidden → JS에서 로그인이면 표시 -->
+                            <button class="comment-action-btn comment-reply-btn" style="display:none;"
                                     th:onclick="|toggleReplyForm(${comment.commentId})|">💬 답글</button>
 
-                            <span sec:authorize="isAuthenticated()"
-                                  th:if="${#authentication.name == comment.memberId}">
+                            <!-- 수정/삭제: 기본 hidden → JS에서 본인이면 표시 -->
+                            <span class="comment-owner-actions" style="display:none;">
                                 <button class="comment-action-btn"
                                         th:onclick="|toggleCommentEdit(${comment.commentId}, true)|">수정</button>
                                 <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
@@ -306,7 +298,10 @@
 
                 <!-- 대댓글 목록 -->
                 <ul class="reply-list" th:if="${comment.replies != null and !#lists.isEmpty(comment.replies)}">
-                    <li class="reply-item" th:each="reply : ${comment.replies}">
+                    <!-- ↓ data-author 로 대댓글 작성자 심어두기 -->
+                    <li class="reply-item"
+                        th:each="reply : ${comment.replies}"
+                        th:data-author="${reply.memberId}">
                         <div class="reply-avatar" th:text="${#strings.substring(reply.memberId, 0, 1)}">B</div>
                         <div class="comment-body">
                             <div class="comment-author-row">
@@ -316,8 +311,8 @@
                             </div>
                             <div class="comment-text" th:text="${reply.content}">대댓글 내용</div>
                             <div class="comment-actions">
-                                <span sec:authorize="isAuthenticated()"
-                                      th:if="${#authentication.name == reply.memberId}">
+                                <!-- 대댓글 삭제: 기본 hidden → JS에서 본인이면 표시 -->
+                                <span class="reply-owner-actions" style="display:none;">
                                     <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
                                           onsubmit="return confirm('삭제하시겠습니까?')">
                                         <input type="hidden" name="commentId" th:value="${reply.commentId}">
@@ -337,8 +332,8 @@
                     </li>
                 </ul>
 
-                <!-- 대댓글 작성 폼 -->
-                <div class="reply-form-wrap" th:id="'reply-form-' + ${comment.commentId}" sec:authorize="isAuthenticated()">
+                <!-- 대댓글 작성 폼: 기본 hidden → JS에서 로그인이면 표시 -->
+                <div class="reply-form-wrap" th:id="'reply-form-' + ${comment.commentId}">
                     <form action="http://localhost:8000/board-service/community/comment" method="post"
                           onsubmit="return confirm('대댓글을 등록하시겠습니까?')">
                         <input type="hidden" name="postId" th:value="${post.postId}">
@@ -421,28 +416,120 @@
 </div>
 
 <script>
+    /* ── header.html 과 동일한 방식으로 로그인 여부 + 본인 여부 판단 ── */
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // sessionStorage 우선, localStorage 폴백 (추후 localStorage로 통일 예정)
+        var loginUserRaw = sessionStorage.getItem('loginUser') || localStorage.getItem('loginUser');
+        var accessToken  = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+        var isLoggedIn   = false;
+        var myId         = null;
+
+        if (loginUserRaw && accessToken) {
+            try {
+                var loginUser = JSON.parse(loginUserRaw);
+                if (loginUser) {
+                    isLoggedIn = true;
+                    myId = loginUser.memberid || loginUser.memberId || loginUser.name || null;
+                }
+            } catch (e) {
+                isLoggedIn = false;
+            }
+        }
+
+        /* ── 로그인 상태 처리 ── */
+        if (isLoggedIn) {
+            // 댓글 작성 폼 표시
+            var commentForm = document.getElementById('commentFormArea');
+            if (commentForm) commentForm.style.display = 'block';
+
+            // 비로그인 안내 숨김
+            var loginNotice = document.getElementById('commentLoginNotice');
+            if (loginNotice) loginNotice.style.display = 'none';
+
+            // 모든 답글 버튼 표시
+            document.querySelectorAll('.comment-reply-btn').forEach(function(btn) {
+                btn.style.display = 'inline-flex';
+            });
+        }
+
+        /* ── 본인 글 수정/삭제 버튼 표시 ── */
+        if (myId) {
+            // 게시글 수정/삭제
+            var postMeta = document.querySelector('.post-meta');
+            if (postMeta && postMeta.dataset.author === myId) {
+                var metaActions = document.getElementById('postMetaActions');
+                if (metaActions) metaActions.style.display = 'flex';
+            }
+
+            // 댓글 수정/삭제
+            document.querySelectorAll('.comment-item').forEach(function(item) {
+                if (item.dataset.author === myId) {
+                    var ownerActions = item.querySelector('.comment-owner-actions');
+                    if (ownerActions) ownerActions.style.display = 'inline';
+                }
+            });
+
+            // 대댓글 삭제
+            document.querySelectorAll('.reply-item').forEach(function(item) {
+                if (item.dataset.author === myId) {
+                    var ownerActions = item.querySelector('.reply-owner-actions');
+                    if (ownerActions) ownerActions.style.display = 'inline';
+                }
+            });
+        }
+
+        /* ── 신고 모달 body로 이동 ── */
+        var modal = document.getElementById('reportModal');
+        if (modal) document.body.appendChild(modal);
+
+        
+        document.getElementById('reportForm').onsubmit = function(e) {
+            var reasonSelected = document.querySelector('input[name="reasonId"]:checked');
+            if (!reasonSelected) {
+                e.preventDefault();
+                alert('신고 유형을 선택해주세요.');
+                return;
+            }
+            if (!confirm('신고를 접수하시겠습니까?')) {
+                e.preventDefault();
+            }
+        };
+       });
+
+    /* ── 공통 함수 ── */
     function closeReport() {
-        const overlay = document.getElementById('reportModal');
+        var overlay = document.getElementById('reportModal');
         overlay.style.cssText = 'display:none !important;';
         document.getElementById('reportForm').reset();
     }
 
-    const reportModal = document.getElementById('reportModal');
+    var reportModal = document.getElementById('reportModal');
     if (reportModal) {
         reportModal.addEventListener('click', function(e) {
             if (e.target === this) closeReport();
         });
     }
 
+    function openReport(targetType, targetId, label) {
+        document.getElementById('reportTargetType').value = targetType;
+        document.getElementById('reportTargetId').value   = targetId;
+        document.getElementById('reportTargetLabel').textContent = label;
+        var overlay = document.getElementById('reportModal');
+        overlay.style.cssText = 'display:flex !important; position:fixed !important; inset:0 !important; background:rgba(0,0,0,0.5) !important; z-index:99999 !important; align-items:center !important; justify-content:center !important;';
+        var modal = overlay.querySelector('.modal');
+        modal.style.cssText = 'display:block !important; background:white !important; border-radius:16px !important; padding:32px !important; width:460px !important; max-width:95vw !important; position:relative !important; z-index:100000 !important;';
+    }
+
     function toggleReplyForm(commentId) {
-        const el = document.getElementById('reply-form-' + commentId);
+        var el = document.getElementById('reply-form-' + commentId);
         if (el) el.classList.toggle('show');
     }
 
     function toggleCommentEdit(commentId, show) {
-        const textEl = document.getElementById('comment-text-' + commentId);
-        const editEl = document.getElementById('comment-edit-' + commentId);
-        const actionsEl = document.getElementById('comment-actions-' + commentId);
+        var textEl    = document.getElementById('comment-text-' + commentId);
+        var editEl    = document.getElementById('comment-edit-' + commentId);
+        var actionsEl = document.getElementById('comment-actions-' + commentId);
         if (show) {
             textEl.style.display = 'none';
             editEl.classList.add('show');
@@ -455,55 +542,24 @@
     }
 
     function toggleEditPost(show) {
-        const titleView = document.getElementById('postTitleView');
-        const contentView = document.getElementById('postContentView');
-        const editWrap = document.getElementById('editPostWrap');
-        const metaActions = document.getElementById('postMetaActions');
-
+        var titleView   = document.getElementById('postTitleView');
+        var contentView = document.getElementById('postContentView');
+        var editWrap    = document.getElementById('editPostWrap');
+        var metaActions = document.getElementById('postMetaActions');
         if (show) {
-            titleView.style.display = 'none';
+            titleView.style.display   = 'none';
             contentView.style.display = 'none';
             editWrap.classList.add('show');
             if (metaActions) metaActions.style.display = 'none';
         } else {
-            titleView.style.display = 'block';
+            titleView.style.display   = 'block';
             contentView.style.display = 'block';
             editWrap.classList.remove('show');
             if (metaActions) metaActions.style.display = 'flex';
         }
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('reportModal');
-        if (modal) {
-            document.body.appendChild(modal);
-        }
-
-        document.getElementById('reportForm').addEventListener('submit', function(e) {
-            const reasonSelected = document.querySelector('input[name="reasonId"]:checked');
-            if (!reasonSelected) {
-                e.preventDefault();
-                alert('신고 유형을 선택해주세요.');
-                return;
-            }
-            if (!confirm('신고를 접수하시겠습니까?')) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    function openReport(targetType, targetId, label) {
-        document.getElementById('reportTargetType').value = targetType;
-        document.getElementById('reportTargetId').value = targetId;
-        document.getElementById('reportTargetLabel').textContent = label;
-
-        const overlay = document.getElementById('reportModal');
-        overlay.style.cssText = 'display:flex !important; position:fixed !important; inset:0 !important; background:rgba(0,0,0,0.5) !important; z-index:99999 !important; align-items:center !important; justify-content:center !important;';
-
-        const modal = overlay.querySelector('.modal');
-        modal.style.cssText = 'display:block !important; background:white !important; border-radius:16px !important; padding:32px !important; width:460px !important; max-width:95vw !important; position:relative !important; z-index:100000 !important;';
-    }
 </script>
+
 </section>
 </body>
 </html>
