@@ -120,10 +120,7 @@ public class CommunityController {
 
         // 세션에 조회한 postId 저장해서 중복 방지
         String sessionKey = "viewed_post_" + postId;
-        if (session.getAttribute(sessionKey) == null) {
-            communityService.increaseViewCount(postId);
-            session.setAttribute(sessionKey, true);
-        }
+        communityService.increaseViewCount(postId);
 
         CommunityPostDTO post = communityService.getPostById(postId);
         List<CommentDTO> comments = commentService.getCommentsWithReplies(postId);
@@ -135,6 +132,14 @@ public class CommunityController {
         model.addAttribute("reportReasons", communityService.getReportReasons());
 
         return "community/view";
+    }
+    
+    @PostMapping("/community/view")
+    public String increaseView(@RequestParam("postId") Long postId) {
+
+        communityService.increaseViewCount(postId);
+
+        return "redirect:/community/view?postId=" + postId;
     }
 
     @PostMapping("/community/comment")

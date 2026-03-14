@@ -93,7 +93,7 @@
         </div>
 
         <div class="write-card">
-            <form th:action="@{/community/write}" method="post" onsubmit="return validateForm()">
+            <form th:action="@{/board-service/community/write}" method="post" onsubmit="return validateForm()">
 
                 <!-- CSRF 토큰 -->
 				
@@ -128,7 +128,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a th:href="@{/community(boardId=${selectedBoard?.boardId})}"
+                    <a th:href="@{/board-service/community(boardId=${selectedBoard?.boardId})}"
                        class="btn-cancel">취소</a>
                     <button type="submit" class="btn-submit">등록</button>
                 </div>
