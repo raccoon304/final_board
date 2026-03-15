@@ -24,7 +24,7 @@ public class CommunityController {
     private final CommunityService communityService;
     private final CommentService commentService;
 
-    // Gateway 기본 URL
+    // Gateway 기본 URL /*확인용*/
     private static final String GATEWAY = "http://localhost:8000/board-service";
 
     public CommunityController(CommunityService communityService, CommentService commentService) {
