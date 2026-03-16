@@ -91,7 +91,7 @@
         </div>
 
         <div class="write-card">
-            <form th:action="@{/board-service/community/write}" method="post" onsubmit="return validateForm()">
+            <form th:action="@{/community/write}" method="post" onsubmit="return validateForm()">
 
                 <!-- 카테고리 -->
                 <div class="form-group">
@@ -123,7 +123,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a th:href="@{/board-service/community(boardId=${selectedBoard?.boardId})}"
+                    <a th:href="@{/community(boardId=${selectedBoard?.boardId})}"
                        class="btn-cancel">취소</a>
                     <button type="submit" class="btn-submit">등록</button>
                 </div>
@@ -148,7 +148,7 @@
 
             if (!isLoggedIn) {
                 alert('로그인이 필요한 서비스입니다.');
-                location.href = 'http://localhost:8000/user-service/member/login';
+                location.href = '/user-service/member/login';
             }
         })();
 

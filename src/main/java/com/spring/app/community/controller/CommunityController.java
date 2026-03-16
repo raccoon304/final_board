@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -19,20 +20,18 @@ import com.spring.app.community.service.CommunityService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/community")
 public class CommunityController {
 
     private final CommunityService communityService;
     private final CommentService commentService;
-
-    // Gateway 기본 URL /*확인용*/
-    private static final String GATEWAY = "http://localhost:8000/board-service";
 
     public CommunityController(CommunityService communityService, CommentService commentService) {
         this.communityService = communityService;
         this.commentService = commentService;
     }
 
-    @GetMapping("/community")
+    @GetMapping
     public String community(Model model,
             @RequestParam(value="boardId", required=false) Long boardId,
             @RequestParam(value="page", defaultValue="1") int page,
@@ -45,8 +44,6 @@ public class CommunityController {
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
             memberId = auth.getName();
         }
-
-        System.out.println("=== memberId: " + memberId);
 
         int totalCount = communityService.getTotalCount(boardId, search, type, memberId);
         int pageSize = 10;
@@ -65,14 +62,9 @@ public class CommunityController {
         model.addAttribute("type", type);
 
         if (memberId != null) {
-            int postCount = communityService.getMyPostCount(memberId);
-            int commentCount = communityService.getMyCommentCount(memberId);
-            System.out.println("=== myPostCount: " + postCount);
-            System.out.println("=== myCommentCount: " + commentCount);
-            model.addAttribute("myPostCount", postCount);
-            model.addAttribute("myCommentCount", commentCount);
+            model.addAttribute("myPostCount", communityService.getMyPostCount(memberId));
+            model.addAttribute("myCommentCount", communityService.getMyCommentCount(memberId));
         } else {
-            System.out.println("=== 로그인 안됨");
             model.addAttribute("myPostCount", 0);
             model.addAttribute("myCommentCount", 0);
         }
@@ -80,8 +72,7 @@ public class CommunityController {
         return "community/community";
     }
 
-
-    @GetMapping("/community/write")
+    @GetMapping("/write")
     public String writeForm(Model model,
             @RequestParam(value="boardId", required=false) Long boardId) {
 
@@ -98,7 +89,7 @@ public class CommunityController {
         return "community/write";
     }
 
-    @PostMapping("/community/write")
+    @PostMapping("/write")
     public String write(@RequestParam("boardId") Long boardId,
                         @RequestParam("title") String title,
                         @RequestParam("content") String content) {
@@ -107,11 +98,10 @@ public class CommunityController {
         String memberId = auth.getName();
 
         communityService.writePost(boardId, title, content, memberId);
-        return "redirect:" + GATEWAY + "/community?boardId=" + boardId;
+        return "redirect:/community?boardId=" + boardId;
     }
 
-
-    @GetMapping("/community/view")
+    @GetMapping("/view")
     public String view(@RequestParam("postId") Long postId,
                        Model model,
                        HttpSession session) {
@@ -138,13 +128,13 @@ public class CommunityController {
         return "community/view";
     }
 
-    @PostMapping("/community/view")
+    @PostMapping("/view")
     public String increaseView(@RequestParam("postId") Long postId) {
         communityService.increaseViewCount(postId);
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 
-    @PostMapping("/community/comment")
+    @PostMapping("/comment")
     public String writeComment(@RequestParam("postId") Long postId,
                                @RequestParam("content") String content,
                                @RequestParam(value="parentCommentId", required=false) Long parentCommentId) {
@@ -152,44 +142,44 @@ public class CommunityController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
-            return "redirect:http://localhost:8000/user-service/member/login";
+        	return "redirect:/user-service/member/login";
         }
 
         commentService.insertComment(postId, content, parentCommentId, auth.getName());
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 
-    @PostMapping("/community/edit")
+    @PostMapping("/edit")
     public String editPost(@RequestParam("postId") Long postId,
                            @RequestParam("title") String title,
                            @RequestParam("content") String content) {
         communityService.editPost(postId, title, content);
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 
-    @PostMapping("/community/delete")
+    @PostMapping("/delete")
     public String deletePost(@RequestParam("postId") Long postId) {
         Long boardId = communityService.getPostById(postId).getBoardId();
         communityService.deletePost(postId);
-        return "redirect:" + GATEWAY + "/community?boardId=" + boardId;
+        return "redirect:/community?boardId=" + boardId;
     }
 
-    @PostMapping("/community/comment/edit")
+    @PostMapping("/comment/edit")
     public String editComment(@RequestParam("commentId") Long commentId,
                               @RequestParam("postId") Long postId,
                               @RequestParam("content") String content) {
         commentService.editComment(commentId, content);
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 
-    @PostMapping("/community/comment/delete")
+    @PostMapping("/comment/delete")
     public String deleteComment(@RequestParam("commentId") Long commentId,
                                 @RequestParam("postId") Long postId) {
         commentService.deleteComment(commentId);
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 
-    @PostMapping("/community/report")
+    @PostMapping("/report")
     public String report(@RequestParam("targetType") int targetType,
                          @RequestParam("targetId") Long targetId,
                          @RequestParam("reasonId") Long reasonId,
@@ -206,6 +196,6 @@ public class CommunityController {
             redirectAttributes.addFlashAttribute("reportMsg", "이미 신고한 대상입니다.");
         }
 
-        return "redirect:" + GATEWAY + "/community/view?postId=" + postId;
+        return "redirect:/community/view?postId=" + postId;
     }
 }

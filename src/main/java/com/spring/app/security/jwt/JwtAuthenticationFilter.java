@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     org.springframework.http.ResponseEntity<java.util.Map> result =
                         rt.exchange(
-                            "http://localhost:8000/user-service/auth/reissue",
+                        		"http://user-service/auth/reissue",
                             org.springframework.http.HttpMethod.POST,
                             entity,
                             java.util.Map.class
@@ -63,6 +63,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     if (result.getStatusCode().is2xxSuccessful() && result.getBody() != null) {
                         String newToken = (String) result.getBody().get("accessToken");
                         token = newToken;
+                        
+                     //  추가
+                        Cookie newTokenCookie = new Cookie("newAccessToken", newToken);
+                        newTokenCookie.setPath("/");
+                        newTokenCookie.setMaxAge(10);
+                        response.addCookie(newTokenCookie);
+
+                        System.out.println("===== 8002 accessToken 자동 재발급 성공");
+                        
+                        response.setHeader("Authorization", "Bearer " + newToken);
+                        response.setHeader("Access-Control-Expose-Headers", "Authorization"); 
 
                      
                         System.out.println("===== 8002 accessToken 자동 재발급 성공");

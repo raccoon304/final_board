@@ -126,7 +126,8 @@
 <section>
 <div class="view-wrap">
 
-    <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
+    <!-- ✅ /board-service 제거 -->
+    <a th:href="@{/community(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
 
     <div th:if="${reportMsg != null}"
          style="padding:12px 20px; background:#E3F2FF; color:#1B8EF8;
@@ -143,7 +144,8 @@
         </div>
 
         <div class="edit-post-wrap" id="editPostWrap">
-            <form action="http://localhost:8000/board-service/community/edit" method="post"
+            <!-- ✅ /board-service 제거 -->
+            <form th:action="@{/community/edit}" method="post"
                   onsubmit="return confirm('저장하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
                 <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -162,7 +164,8 @@
             <span>조회 <span th:text="${post.viewCount}">0</span></span>
             <div class="post-meta-actions" id="postMetaActions" style="display:none;">
                 <button class="btn-sm" onclick="toggleEditPost(true)">✏️ 수정</button>
-                <form action="http://localhost:8000/board-service/community/delete" method="post" style="display:inline;"
+                <!-- /board-service 제거 -->
+                <form th:action="@{/community/delete}" method="post"
                       onsubmit="return confirm('삭제하시겠습니까?')">
                     <input type="hidden" name="postId" th:value="${post.postId}">
                     <button type="submit" class="btn-sm danger">🗑️ 삭제</button>
@@ -184,14 +187,15 @@
 
     <!-- 이전/다음 글 -->
     <div class="post-nav">
+        <!-- ✅ /board-service 제거 -->
         <a class="post-nav-item"
-           th:href="${prevPost != null} ? @{'http://localhost:8000/board-service/community/view'(postId=${prevPost.postId})} : '#'"
+           th:href="${prevPost != null} ? @{/community/view(postId=${prevPost.postId})} : '#'"
            th:classappend="${prevPost == null} ? 'disabled'">
             <span class="post-nav-label">▲ 이전</span>
             <span th:text="${prevPost != null} ? ${prevPost.title} : '이전 글이 없습니다.'">이전글</span>
         </a>
         <a class="post-nav-item"
-           th:href="${nextPost != null} ? @{'http://localhost:8000/board-service/community/view'(postId=${nextPost.postId})} : '#'"
+           th:href="${nextPost != null} ? @{/community/view(postId=${nextPost.postId})} : '#'"
            th:classappend="${nextPost == null} ? 'disabled'">
             <span class="post-nav-label">▼ 다음</span>
             <span th:text="${nextPost != null} ? ${nextPost.title} : '다음 글이 없습니다.'">다음글</span>
@@ -205,7 +209,8 @@
         </div>
 
         <div class="comment-form" id="commentFormArea" style="display:none;">
-            <form action="http://localhost:8000/board-service/community/comment" method="post"
+            <!-- /board-service 제거 -->
+            <form th:action="@{/community/comment}" method="post"
                   onsubmit="return confirm('댓글을 등록하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
                 <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -217,7 +222,8 @@
         </div>
         <div id="commentLoginNotice"
              style="padding:14px; background:#F5F7FA; border-radius:8px; text-align:center; font-size:14px; color:#999; margin-bottom:24px;">
-            댓글을 작성하려면 <a href="http://localhost:8000/user-service/member/login" style="color:#1B8EF8; font-weight:600;">로그인</a>이 필요합니다.
+            <!-- /board-service 제거 (user-service는 그대로) -->
+            댓글을 작성하려면 <a th:href="@{/user-service/member/login}" style="color:#1B8EF8; font-weight:600;">로그인</a>이 필요합니다.
         </div>
 
         <ul class="comment-list">
@@ -243,7 +249,8 @@
                              class="comment-text" th:text="${comment.content}">내용</div>
 
                         <div th:id="'comment-edit-' + ${comment.commentId}" class="comment-edit-wrap">
-                            <form action="http://localhost:8000/board-service/community/comment/edit" method="post"
+                            <!-- /board-service 제거 -->
+                            <form th:action="@{/community/comment/edit}" method="post"
                                   onsubmit="return confirm('수정하시겠습니까?')">
                                 <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                 <input type="hidden" name="postId" th:value="${post.postId}">
@@ -264,7 +271,8 @@
                             <span class="comment-owner-actions" style="display:none;">
                                 <button class="comment-action-btn"
                                         th:onclick="|toggleCommentEdit(${comment.commentId}, true)|">수정</button>
-                                <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
+                                <!-- /board-service 제거 -->
+                                <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
                                       onsubmit="return confirm('삭제하시겠습니까?')">
                                     <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                     <input type="hidden" name="postId" th:value="${post.postId}">
@@ -297,7 +305,8 @@
                             <div class="comment-text" th:text="${reply.content}">대댓글 내용</div>
                             <div class="comment-actions">
                                 <span class="reply-owner-actions" style="display:none;">
-                                    <form action="http://localhost:8000/board-service/community/comment/delete" method="post" style="display:inline;"
+                                    <!-- ✅ /board-service 제거 -->
+                                    <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
                                           onsubmit="return confirm('삭제하시겠습니까?')">
                                         <input type="hidden" name="commentId" th:value="${reply.commentId}">
                                         <input type="hidden" name="postId" th:value="${post.postId}">
@@ -317,7 +326,8 @@
                 </ul>
 
                 <div class="reply-form-wrap" th:id="'reply-form-' + ${comment.commentId}">
-                    <form action="http://localhost:8000/board-service/community/comment" method="post"
+                    <!-- ✅ /board-service 제거 -->
+                    <form th:action="@{/community/comment}" method="post"
                           onsubmit="return confirm('대댓글을 등록하시겠습니까?')">
                         <input type="hidden" name="postId" th:value="${post.postId}">
                         <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -333,15 +343,16 @@
             </li>
         </ul>
 
+        <!-- /board-service 제거 -->
         <div class="comment-pagination"
              th:if="${commentTotalPages != null and commentTotalPages > 1}">
-            <a th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=1)}"
+            <a th:href="@{/community/view(postId=${post.postId},commentPage=1)}"
                th:classappend="${commentPage == 1} ? 'disabled'">◀</a>
             <a th:each="i : ${#numbers.sequence(1, commentTotalPages)}"
-               th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=${i})}"
+               th:href="@{/community/view(postId=${post.postId},commentPage=${i})}"
                th:text="${i}"
                th:classappend="${i == commentPage} ? 'active'"></a>
-            <a th:href="@{'http://localhost:8000/board-service/community/view'(postId=${post.postId},commentPage=${commentTotalPages})}"
+            <a th:href="@{/community/view(postId=${post.postId},commentPage=${commentTotalPages})}"
                th:classappend="${commentPage == commentTotalPages} ? 'disabled'">▶</a>
         </div>
     </div>
@@ -354,7 +365,8 @@
         <div class="modal-subtitle">허위 신고 시 서비스 이용이 제한될 수 있습니다.</div>
         <div class="modal-target">신고 대상: <strong id="reportTargetLabel">-</strong></div>
 
-        <form action="http://localhost:8000/board-service/community/report" method="post" id="reportForm">
+        <!--  /board-service 제거 -->
+        <form th:action="@{/community/report}" method="post" id="reportForm">
             <input type="hidden" name="targetType" id="reportTargetType">
             <input type="hidden" name="targetId" id="reportTargetId">
             <input type="hidden" name="postId" th:value="${post.postId}">
@@ -398,44 +410,36 @@
 </div>
 
 <script th:inline="javascript">
-    /* ── /auth/check API로 로그인 여부 확인 ── */
-    // fetch('/auth/check') 전체 삭제하고 이걸로 교체
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
-    var postFooter = document.querySelector('.post-footer');
-    var commentCard = document.querySelector('.comment-card');
+        var postFooter = document.querySelector('.post-footer');
+        var commentCard = document.querySelector('.comment-card');
 
-    // Thymeleaf로 서버에서 직접 받기
-    var myId = /*[[${memberId}]]*/ null;
-    var isLoggedIn = myId !== null && myId !== '' && myId !== 'null';
+        var myId = /*[[${memberId}]]*/ null;
+        var isLoggedIn = myId !== null && myId !== '' && myId !== 'null';
 
-    applyLoginState(isLoggedIn, isLoggedIn ? myId : null);
+        applyLoginState(isLoggedIn, isLoggedIn ? myId : null);
 
-    if (postFooter) postFooter.style.visibility = 'visible';
-    if (commentCard) commentCard.style.visibility = 'visible';
+        if (postFooter) postFooter.style.visibility = 'visible';
+        if (commentCard) commentCard.style.visibility = 'visible';
 
-    // 신고 모달 body로 이동
-    var modal = document.getElementById('reportModal');
-    if (modal) document.body.appendChild(modal);
+        var modal = document.getElementById('reportModal');
+        if (modal) document.body.appendChild(modal);
 
-    document.getElementById('reportForm').onsubmit = function(e) {
-        var reasonSelected = document.querySelector('input[name="reasonId"]:checked');
-        if (!reasonSelected) {
-            e.preventDefault();
-            alert('신고 유형을 선택해주세요.');
-            return;
-        }
-        if (!confirm('신고를 접수하시겠습니까?')) {
-            e.preventDefault();
-        }
-    };
-
-      
+        document.getElementById('reportForm').onsubmit = function(e) {
+            var reasonSelected = document.querySelector('input[name="reasonId"]:checked');
+            if (!reasonSelected) {
+                e.preventDefault();
+                alert('신고 유형을 선택해주세요.');
+                return;
+            }
+            if (!confirm('신고를 접수하시겠습니까?')) {
+                e.preventDefault();
+            }
+        };
     });
 
     function applyLoginState(isLoggedIn, myId) {
-
-        /* ── 로그인 상태 처리 ── */
         if (isLoggedIn) {
             var commentForm = document.getElementById('commentFormArea');
             if (commentForm) commentForm.style.display = 'block';
@@ -448,7 +452,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        /* ── 비로그인 시 신고 버튼 숨김 ── */
         if (!isLoggedIn) {
             var postReportBtn = document.querySelector('.report-btn');
             if (postReportBtn) postReportBtn.style.display = 'none';
@@ -458,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        /* ── 본인 글 수정/삭제 버튼 표시 ── */
         if (myId) {
             var postMeta = document.querySelector('.post-meta');
             if (postMeta && postMeta.dataset.author === myId) {
@@ -482,7 +484,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    /* ── 공통 함수 ── */
     function closeReport() {
         var overlay = document.getElementById('reportModal');
         overlay.style.cssText = 'display:none !important;';

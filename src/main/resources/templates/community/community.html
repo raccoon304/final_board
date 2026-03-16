@@ -2,7 +2,6 @@
 <html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script[name='scripts']}, ~{::section})}"
       lang="ko"
       xmlns:th="http://www.thymeleaf.org">
-<!--  sec:authorize 제거 — xmlns:sec 불필요 -->
 
 <head>
     <meta charset="UTF-8">
@@ -143,7 +142,7 @@
         <h1>💬 커뮤니티</h1>
         <p>취업 준비부터 직장 생활까지, 함께 이야기해요</p>
         <div class="search-container">
-            <form action="http://localhost:8000/board-service/community" method="get">
+            <form th:action="@{/community}" method="get">
                 <input type="hidden" name="boardId" th:value="${currentBoardId}">
                 <input type="text" name="search" th:value="${param.search}" placeholder="궁금한 내용을 검색해보세요...">
                 <button type="submit">검색</button>
@@ -160,13 +159,13 @@
                 <h3>카테고리</h3>
                 <ul class="category-list">
                     <li>
-                        <a href="http://localhost:8000/board-service/community"
+                        <a th:href="@{/community}"
                            th:classappend="${currentBoardId == null} ? 'active'">
                             📋 전체글
                         </a>
                     </li>
                     <li th:each="board : ${boards}">
-                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${board.boardId})}"
+                        <a th:href="@{/community(boardId=${board.boardId})}"
                            th:classappend="${currentBoardId == board.boardId} ? 'active'">
                             <span th:text="${board.title}"></span>
                             <span class="category-count" th:text="${board.postCount}"></span>
@@ -181,17 +180,16 @@
             <div class="content-header">
                <div class="content-actions" style="margin-left: auto;">
                     <div class="sort-buttons">
-                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='latest')}"
+                        <a th:href="@{/community(boardId=${currentBoardId},sort='latest')}"
                            th:classappend="${sort == 'latest' or sort == null} ? 'active'">최신순</a>
-                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='popular')}"
+                        <a th:href="@{/community(boardId=${currentBoardId},sort='popular')}"
                            th:classappend="${sort == 'popular'} ? 'active'">인기순</a>
-                        <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},sort='comments')}"
+                        <a th:href="@{/community(boardId=${currentBoardId},sort='comments')}"
                            th:classappend="${sort == 'comments'} ? 'active'">댓글순</a>
                     </div>
 
-                    <!-- ↓ sec:authorize 제거 → JS로 제어 (기본 hidden) -->
                     <a id="writeBtnArea"
-                       th:href="@{'http://localhost:8000/board-service/community/write'(boardId=${currentBoardId})}"
+                       th:href="@{/community/write(boardId=${currentBoardId})}"
                        class="write-button"
                        style="display:none;">✏️ 글쓰기</a>
                 </div>
@@ -217,7 +215,7 @@
                         </td>
                     </tr>
                     <tr th:each="post, postStat : ${posts}"
-                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|"
+                        th:onclick="|location.href='/community/view?postId=' + ${post.postId}|"
                         style="border-bottom:1px solid #F0F0F0; cursor:pointer; transition: background 0.2s;"
                         onmouseover="this.style.background='#F9FBFD'"
                         onmouseout="this.style.background='white'">
@@ -241,11 +239,11 @@
                         </td>
 
                         <td style="padding:14px 8px; text-align:center;">
-						    <div style="font-size:13px; color:#666; font-weight:500;" 
-						         th:text="${post.memberId}"></div>
-						    <div style="font-size:11px; color:#aaa; margin-top:2px;"
-						         th:text="${post.communityCompanyName} ?: ''"  ></div>
-						</td>
+                            <div style="font-size:13px; color:#666; font-weight:500;"
+                                 th:text="${post.memberId}"></div>
+                            <div style="font-size:11px; color:#aaa; margin-top:2px;"
+                                 th:text="${post.communityCompanyName} ?: ''"></div>
+                        </td>
 
                         <td style="padding:14px 8px; text-align:center; font-size:12px; color:#999;"
                             th:text="${#temporals.format(post.createdAt, 'MM-dd')}"></td>
@@ -261,15 +259,15 @@
 
             <!-- 페이지네이션 -->
             <div class="pagination">
-                <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=1,sort=${sort},search=${param.search})}"
+                <a th:href="@{/community(boardId=${currentBoardId},page=1,sort=${sort},search=${param.search})}"
                    th:classappend="${currentPage == 1} ? 'disabled'">◀</a>
 
                 <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-                   th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=${i},sort=${sort},search=${param.search})}"
+                   th:href="@{/community(boardId=${currentBoardId},page=${i},sort=${sort},search=${param.search})}"
                    th:text="${i}"
                    th:classappend="${i == currentPage} ? 'active'"></a>
 
-                <a th:href="@{'http://localhost:8000/board-service/community'(boardId=${currentBoardId},page=${totalPages},sort=${sort},search=${param.search})}"
+                <a th:href="@{/community(boardId=${currentBoardId},page=${totalPages},sort=${sort},search=${param.search})}"
                    th:classappend="${currentPage == totalPages} ? 'disabled'">▶</a>
             </div>
         </main>
@@ -281,7 +279,7 @@
             <div class="widget" id="myActivityWidget" style="display:none;">
                 <h3>👤 나의 활동</h3>
                 <div style="display:flex; gap:8px; margin-bottom:16px;">
-                    <a th:href="@{'http://localhost:8000/board-service/community'(type='myposts')}"
+                    <a th:href="@{/community(type='myposts')}"
                        style="flex:1; text-align:center; padding:10px; background:#E3F2FF;
                               color:#1B8EF8; border-radius:8px; font-size:13px;
                               font-weight:600; text-decoration:none;">
@@ -289,7 +287,7 @@
                         <span style="font-size:18px; font-weight:700;"
                               th:text="${myPostCount}">0</span>
                     </a>
-                    <a th:href="@{'http://localhost:8000/board-service/community'(type='mycomments')}"
+                    <a th:href="@{/community(type='mycomments')}"
                        style="flex:1; text-align:center; padding:10px; background:#F0FFF4;
                               color:#27AE60; border-radius:8px; font-size:13px;
                               font-weight:600; text-decoration:none;">
@@ -299,52 +297,73 @@
                     </a>
                 </div>
             </div>
+       
+			<!-- 인기 게시글 TOP 5 -->
+			<div class="widget">
+			    <h3>🔥 인기 게시글 TOP 5</h3>
+			    <ul class="hot-posts-list">
+			        <li class="hot-post-item" th:each="post, stat : ${hotPosts}"
+			            th:onclick="|location.href='/community/view?postId=' + ${post.postId}|">
+			            <div class="hot-rank" th:text="${stat.count}"></div>
+			            <div class="hot-post-content">
+			                <div class="hot-post-category" th:text="'[' + ${post.boardTitle} + ']'"></div>
+			                <div class="hot-post-title" th:text="${post.title}"></div>
+			            </div>
+			        </li>
+			    </ul>
+			</div>
 
-            <!-- 인기 게시글 TOP 5 -->
-            <div class="widget">
-                <h3>🔥 인기 게시글 TOP 5</h3>
-                <ul class="hot-posts-list">
-                    <li class="hot-post-item" th:each="post, stat : ${hotPosts}"
-                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|">
-                        <div class="hot-rank" th:text="${stat.count}"></div>
-                        <div class="hot-post-content">
-                            <div class="hot-post-category" th:text="'[' + ${post.boardTitle} + ']'"></div>
-                            <div class="hot-post-title" th:text="${post.title}"></div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- 최근 7일 인기글 -->
-            <div class="widget">
-                <h3>🕐 최근 7일 인기글</h3>
-                <ul class="hot-posts-list">
-                    <li class="hot-post-item" th:if="${#lists.isEmpty(recentHotPosts)}">
-                        <span style="color:#999; font-size:13px;">최근 인기글이 없습니다.</span>
-                    </li>
-                    <li class="hot-post-item" th:each="post, stat : ${recentHotPosts}"
-                        th:onclick="|location.href='http://localhost:8000/board-service/community/view?postId=' + ${post.postId}|">
-                        <div class="hot-rank" th:text="${stat.count}"></div>
-                        <div class="hot-post-content">
-                            <div class="hot-post-title" th:text="${post.title}"></div>
-                            <div class="hot-post-category">👁️ <span th:text="${post.viewCount}"></span></div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
+			<!-- 최근 7일 인기글 -->
+			<div class="widget">
+			    <h3>🕐 최근 7일 인기글</h3>
+			    <ul class="hot-posts-list">
+			        <li class="hot-post-item" th:if="${#lists.isEmpty(recentHotPosts)}">
+			            <span style="color:#999; font-size:13px;">최근 인기글이 없습니다.</span>
+			        </li>
+			        <li class="hot-post-item" th:each="post, stat : ${recentHotPosts}"
+			            th:onclick="|location.href='/community/view?postId=' + ${post.postId}|">
+			            <div class="hot-rank" th:text="${stat.count}"></div>
+			            <div class="hot-post-content">
+			                <div class="hot-post-title" th:text="${post.title}"></div>
+			                <div class="hot-post-category">👁️ <span th:text="${post.viewCount}"></span></div>
+			            </div>
+			        </li>
+			    </ul>
+			</div>
         </aside>
     </div>
 
     <script name="scripts">
         document.addEventListener('DOMContentLoaded', function () {
 
-            /* ── header.html 과 동일한 방식으로 로그인 여부 판단 ── */
+            // 서버에서 재발급한 토큰 쿠키 감지 → sessionStorage 갱신
+            const newTokenCookie = document.cookie.split(';')
+                .find(c => c.trim().startsWith('newAccessToken='));
+            if (newTokenCookie) {
+                const newToken = newTokenCookie.trim().split('=')[1];
+                if (window.JPAuth) {
+                    window.JPAuth.setAccessToken(newToken);
+                } else {
+                    sessionStorage.setItem('accessToken', newToken);
+                }
+                document.cookie = 'newAccessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                console.log('[JPAuth] 서버 재발급 토큰 갱신 완료');
+            }
+
             var loginUserRaw = localStorage.getItem('loginUser');
             var accessToken  = sessionStorage.getItem('accessToken');
             var isLoggedIn   = false;
 
-            if (loginUserRaw && accessToken) {
+            function isTokenExpired(token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return payload.exp * 1000 < Date.now();
+                } catch (e) {
+                    return true;
+                }
+            }
+
+            if (loginUserRaw && accessToken && !isTokenExpired(accessToken)) {
                 try {
                     var loginUser = JSON.parse(loginUserRaw);
                     if (loginUser) isLoggedIn = true;
@@ -353,13 +372,10 @@
                 }
             }
 
-            /* ── 로그인 상태에 따라 요소 표시/숨김 ── */
             if (isLoggedIn) {
-                // 글쓰기 버튼 표시
                 var writeBtn = document.getElementById('writeBtnArea');
                 if (writeBtn) writeBtn.style.display = 'inline-flex';
 
-                // 나의 활동 위젯 표시
                 var myActivity = document.getElementById('myActivityWidget');
                 if (myActivity) myActivity.style.display = 'block';
             }
