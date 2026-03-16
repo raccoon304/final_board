@@ -2,6 +2,7 @@ package com.spring.app.community.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,9 @@ public class CommunityController {
     private final CommunityService communityService;
     private final CommentService commentService;
 
+    @Value("${app.login-url}")
+    private String loginUrl;
+    
     public CommunityController(CommunityService communityService, CommentService commentService) {
         this.communityService = communityService;
         this.commentService = commentService;
@@ -104,7 +108,8 @@ public class CommunityController {
     @GetMapping("/view")
     public String view(@RequestParam("postId") Long postId,
                        Model model,
-                       HttpSession session) {
+                       HttpSession session,
+                       jakarta.servlet.http.HttpServletRequest request) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String memberId = null;
@@ -114,6 +119,19 @@ public class CommunityController {
         }
         model.addAttribute("memberId", memberId);
 
+        //  추가 - 쿠키에서 accessToken 꺼내서 모델에 담기
+        String accessToken = null;
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        
+        model.addAttribute("accessToken", accessToken);
+        
         communityService.increaseViewCount(postId);
 
         CommunityPostDTO post = communityService.getPostById(postId);
@@ -137,12 +155,14 @@ public class CommunityController {
     @PostMapping("/comment")
     public String writeComment(@RequestParam("postId") Long postId,
                                @RequestParam("content") String content,
-                               @RequestParam(value="parentCommentId", required=false) Long parentCommentId) {
+                               @RequestParam(value="parentCommentId", required=false) Long parentCommentId,
+                               jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
-        	return "redirect:/user-service/member/login";
+            response.sendRedirect(loginUrl);
+            return null;
         }
 
         commentService.insertComment(postId, content, parentCommentId, auth.getName());

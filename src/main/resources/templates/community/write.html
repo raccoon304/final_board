@@ -91,7 +91,7 @@
         </div>
 
         <div class="write-card">
-            <form th:action="@{/community/write}" method="post" onsubmit="return validateForm()">
+            <form th:action="@{write}" method="post" onsubmit="return validateForm()">
 
                 <!-- 카테고리 -->
                 <div class="form-group">
@@ -123,7 +123,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a th:href="@{/community(boardId=${selectedBoard?.boardId})}"
+                    <a th:href="@{../community(boardId=${selectedBoard?.boardId})}"
                        class="btn-cancel">취소</a>
                     <button type="submit" class="btn-submit">등록</button>
                 </div>
@@ -132,7 +132,8 @@
 
     </div>
 
-    <script>
+    <script th:inline="javascript">
+    	const contextPath = /*[[@{/}]]*/ "";
         /* ── 비로그인 접근 차단 (header.html 과 동일한 방식) ── */
         (function () {
             var loginUserRaw = sessionStorage.getItem('loginUser') || localStorage.getItem('loginUser');
@@ -148,7 +149,7 @@
 
             if (!isLoggedIn) {
                 alert('로그인이 필요한 서비스입니다.');
-                location.href = '/user-service/member/login';
+                location.href = contextPath + 'user-service/member/login';
             }
         })();
 

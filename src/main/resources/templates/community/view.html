@@ -126,8 +126,8 @@
 <section>
 <div class="view-wrap">
 
-    <!-- ✅ /board-service 제거 -->
-    <a th:href="@{/community(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
+    <!-- 상대경로로 변환 -->
+    <a th:href="@{../community(boardId=${post.boardId})}" class="back-btn">← 목록으로</a>
 
     <div th:if="${reportMsg != null}"
          style="padding:12px 20px; background:#E3F2FF; color:#1B8EF8;
@@ -144,8 +144,8 @@
         </div>
 
         <div class="edit-post-wrap" id="editPostWrap">
-            <!-- ✅ /board-service 제거 -->
-            <form th:action="@{/community/edit}" method="post"
+            <!-- /board-service 제거 -->
+            <form th:action="@{../community/edit}" method="post"
                   onsubmit="return confirm('저장하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
                 <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -165,7 +165,7 @@
             <div class="post-meta-actions" id="postMetaActions" style="display:none;">
                 <button class="btn-sm" onclick="toggleEditPost(true)">✏️ 수정</button>
                 <!-- /board-service 제거 -->
-                <form th:action="@{/community/delete}" method="post"
+                <form th:action="@{../community/delete}" method="post"
                       onsubmit="return confirm('삭제하시겠습니까?')">
                     <input type="hidden" name="postId" th:value="${post.postId}">
                     <button type="submit" class="btn-sm danger">🗑️ 삭제</button>
@@ -187,15 +187,16 @@
 
     <!-- 이전/다음 글 -->
     <div class="post-nav">
-        <!-- ✅ /board-service 제거 -->
+        <!-- 상대경로 변환 -->
         <a class="post-nav-item"
-           th:href="${prevPost != null} ? @{/community/view(postId=${prevPost.postId})} : '#'"
+           th:href="${prevPost != null} ? @{view(postId=${prevPost.postId}, token=${accessToken})} : '#'"
            th:classappend="${prevPost == null} ? 'disabled'">
             <span class="post-nav-label">▲ 이전</span>
             <span th:text="${prevPost != null} ? ${prevPost.title} : '이전 글이 없습니다.'">이전글</span>
         </a>
+        
         <a class="post-nav-item"
-           th:href="${nextPost != null} ? @{/community/view(postId=${nextPost.postId})} : '#'"
+           th:href="${nextPost != null} ? @{view(postId=${nextPost.postId}, token=${accessToken})} : '#'"
            th:classappend="${nextPost == null} ? 'disabled'">
             <span class="post-nav-label">▼ 다음</span>
             <span th:text="${nextPost != null} ? ${nextPost.title} : '다음 글이 없습니다.'">다음글</span>
@@ -210,7 +211,7 @@
 
         <div class="comment-form" id="commentFormArea" style="display:none;">
             <!-- /board-service 제거 -->
-            <form th:action="@{/community/comment}" method="post"
+            <form th:action="@{../community/comment}" method="post"
                   onsubmit="return confirm('댓글을 등록하시겠습니까?')">
                 <input type="hidden" name="postId" th:value="${post.postId}">
                 <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -250,7 +251,7 @@
 
                         <div th:id="'comment-edit-' + ${comment.commentId}" class="comment-edit-wrap">
                             <!-- /board-service 제거 -->
-                            <form th:action="@{/community/comment/edit}" method="post"
+                            <form th:action="@{../community/comment/edit}" method="post"
                                   onsubmit="return confirm('수정하시겠습니까?')">
                                 <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                 <input type="hidden" name="postId" th:value="${post.postId}">
@@ -272,7 +273,7 @@
                                 <button class="comment-action-btn"
                                         th:onclick="|toggleCommentEdit(${comment.commentId}, true)|">수정</button>
                                 <!-- /board-service 제거 -->
-                                <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
+                                <form th:action="@{../community/comment/delete}" method="post" style="display:inline;"
                                       onsubmit="return confirm('삭제하시겠습니까?')">
                                     <input type="hidden" name="commentId" th:value="${comment.commentId}">
                                     <input type="hidden" name="postId" th:value="${post.postId}">
@@ -305,8 +306,8 @@
                             <div class="comment-text" th:text="${reply.content}">대댓글 내용</div>
                             <div class="comment-actions">
                                 <span class="reply-owner-actions" style="display:none;">
-                                    <!-- ✅ /board-service 제거 -->
-                                    <form th:action="@{/community/comment/delete}" method="post" style="display:inline;"
+                                    <!-- /board-service 제거 -->
+                                    <form th:action="@{../community/comment/delete}" method="post" style="display:inline;"
                                           onsubmit="return confirm('삭제하시겠습니까?')">
                                         <input type="hidden" name="commentId" th:value="${reply.commentId}">
                                         <input type="hidden" name="postId" th:value="${post.postId}">
@@ -326,8 +327,8 @@
                 </ul>
 
                 <div class="reply-form-wrap" th:id="'reply-form-' + ${comment.commentId}">
-                    <!-- ✅ /board-service 제거 -->
-                    <form th:action="@{/community/comment}" method="post"
+                    <!-- /board-service 제거 -->
+                    <form th:action="@{../community/comment}" method="post"
                           onsubmit="return confirm('대댓글을 등록하시겠습니까?')">
                         <input type="hidden" name="postId" th:value="${post.postId}">
                         <input type="hidden" name="boardId" th:value="${post.boardId}">
@@ -346,13 +347,13 @@
         <!-- /board-service 제거 -->
         <div class="comment-pagination"
              th:if="${commentTotalPages != null and commentTotalPages > 1}">
-            <a th:href="@{/community/view(postId=${post.postId},commentPage=1)}"
+            <a th:href="@{view(postId=${post.postId},commentPage=1)}"
                th:classappend="${commentPage == 1} ? 'disabled'">◀</a>
             <a th:each="i : ${#numbers.sequence(1, commentTotalPages)}"
-               th:href="@{/community/view(postId=${post.postId},commentPage=${i})}"
+               th:href="@{view(postId=${post.postId},commentPage=${i})}"
                th:text="${i}"
                th:classappend="${i == commentPage} ? 'active'"></a>
-            <a th:href="@{/community/view(postId=${post.postId},commentPage=${commentTotalPages})}"
+            <a th:href="@{view(postId=${post.postId},commentPage=${commentTotalPages})}"
                th:classappend="${commentPage == commentTotalPages} ? 'disabled'">▶</a>
         </div>
     </div>
@@ -366,7 +367,7 @@
         <div class="modal-target">신고 대상: <strong id="reportTargetLabel">-</strong></div>
 
         <!--  /board-service 제거 -->
-        <form th:action="@{/community/report}" method="post" id="reportForm">
+        <form th:action="@{../community/report}" method="post" id="reportForm">
             <input type="hidden" name="targetType" id="reportTargetType">
             <input type="hidden" name="targetId" id="reportTargetId">
             <input type="hidden" name="postId" th:value="${post.postId}">
@@ -410,20 +411,12 @@
 </div>
 
 <script th:inline="javascript">
+    const contextPath = /*[[@{/}]]*/ "";
+
     document.addEventListener('DOMContentLoaded', function () {
 
-		const newTokenCookie = document.cookie.split(';')
-		        .find(c => c.trim().startsWith('newAccessToken='));
-		    if (newTokenCookie) {
-		        const newToken = newTokenCookie.trim().split('=')[1];
-		        if (window.JPAuth) {
-		            window.JPAuth.setAccessToken(newToken);
-		        } else {
-		            sessionStorage.setItem('accessToken', newToken);
-		        }
-		        document.cookie = 'newAccessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-		    }
-		
+        // ✅ newAccessToken 쿠키 로직 제거 (불필요)
+
         var postFooter = document.querySelector('.post-footer');
         var commentCard = document.querySelector('.comment-card');
 
