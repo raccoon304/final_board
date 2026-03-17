@@ -135,7 +135,7 @@ tasks.withType(JavaCompile) {
 
 sonar {
 	properties {
-		property 'sonar.projectKey', 'final_project'
+		property 'sonar.projectKey', 'final_board'
 		property 'sonar.host.url', 'http://localhost:9000'
 	}
 }
