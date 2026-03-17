@@ -4,10 +4,15 @@
         class="jp-header">
 
   <script>
+    const gatewayOrigin = window.location.origin;
+    const userServiceBase = gatewayOrigin + '/user-service';
+    const boardServiceBase = gatewayOrigin + '/board-service';
+
     function moveAfterRead(event, notiId, url) {
       event.preventDefault();
-      fetch('http://localhost:8000/user-service/finalProject/notification/api/read/' + notiId, {
-        method: 'POST'
+      fetch(userServiceBase + '/finalProject/notification/api/read/' + notiId, {
+        method: 'POST',
+        credentials: 'include'
       })
       .catch(() => {})
       .finally(() => {
@@ -25,7 +30,7 @@
     function handleLogout(event) {
       event.preventDefault();
 
-      fetch('http://localhost:8000/user-service/auth/logout', {
+      fetch(userServiceBase + '/security/logout', {
         method: 'POST',
         credentials: 'include',
       })
@@ -37,7 +42,7 @@
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('refreshToken');
 
-        window.location.href = 'http://localhost:8000/user-service/member/login';
+        window.location.href = userServiceBase + '/member/login';
       });
     }
 
@@ -51,8 +56,7 @@
 
       if (!msaGuestMenu || !msaUserMenu) return;
 
-      // ✅ auth/check API로 로그인 여부 확인
-      fetch('http://localhost:8000/user-service/auth/check', {
+      fetch(userServiceBase + '/auth/check', {
         method: 'GET',
         credentials: 'include'
       })
@@ -62,18 +66,21 @@
           if (msaLoginMemberId) {
             msaLoginMemberId.textContent = data.memberId || '회원';
           }
+
           msaGuestMenu.classList.add('d-none');
           msaUserMenu.classList.remove('d-none');
 
-          // 권한별 메뉴 - localStorage 폴백
+          // 권한별 메뉴 - 기존 localStorage 폴백 유지
           const loginUserRaw = localStorage.getItem('loginUser');
           let role = '';
+
           if (loginUserRaw) {
             try {
               const loginUser = JSON.parse(loginUserRaw);
               role = loginUser.role || '';
             } catch (e) {}
           }
+
           if (msaAdminMenu && role.includes('ADMIN')) msaAdminMenu.classList.remove('d-none');
           if (msaCompanyMenu && role.includes('COMPANY')) msaCompanyMenu.classList.remove('d-none');
           if (msaMemberMenu && role.includes('MEMBER')) msaMemberMenu.classList.remove('d-none');
@@ -93,7 +100,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container-fluid jp-container">
 
-      <a class="navbar-brand d-flex align-items-center jp-brand" href="http://localhost:8000/user-service/">
+      <a class="navbar-brand d-flex align-items-center jp-brand" href="/">
         <span class="jp-brand__icon">
           <i class="fa-solid fa-magnifying-glass"></i>
         </span>
@@ -107,18 +114,18 @@
 
       <div class="collapse navbar-collapse" id="jpNav">
         <ul class="navbar-nav mr-auto jp-nav">
-          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/job/list">채용정보</a></li>
-          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/companyinfo/list">기업정보</a></li>
-          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/board-service/community">커뮤니티</a></li>
-          <li class="nav-item"><a class="nav-link" href="http://localhost:8000/user-service/notice">공지사항</a></li>
+          <li class="nav-item"><a class="nav-link" href="/user-service/job/list">채용정보</a></li>
+          <li class="nav-item"><a class="nav-link" href="/user-service/companyinfo/list">기업정보</a></li>
+          <li class="nav-item"><a class="nav-link" href="/board-service/community">커뮤니티</a></li>
+          <li class="nav-item"><a class="nav-link" href="/user-service/notice">공지사항</a></li>
         </ul>
 
         <div class="d-flex align-items-center jp-auth">
 
           <!-- 로그인 전 -->
           <div id="msaGuestMenu" class="d-none">
-            <a class="jp-auth__link" href="http://localhost:8000/user-service/member/login">로그인</a>
-            <a class="btn btn-primary jp-auth__btn ml-2" href="http://localhost:8000/user-service/member/registerMember">회원가입</a>
+            <a class="jp-auth__link" href="/user-service/member/login">로그인</a>
+            <a class="btn btn-primary jp-auth__btn ml-2" href="/user-service/member/registerMember">회원가입</a>
           </div>
 
           <!-- 로그인 후 -->
@@ -131,17 +138,17 @@
 
               <!-- 관리자 -->
               <div id="msaAdminMenu" class="d-none">
-                <a class="jp-auth__link" href="http://localhost:8000/user-service/admin/admin_dashboard">관리자</a>
+                <a class="jp-auth__link" href="/user-service/admin/admin_dashboard">관리자</a>
               </div>
 
               <!-- 기업 -->
               <div id="msaCompanyMenu" class="d-none">
-                <a class="jp-auth__link" href="http://localhost:8000/user-service/company/company_dashboard">기업페이지</a>
+                <a class="jp-auth__link" href="/user-service/company/company_dashboard">기업페이지</a>
               </div>
 
               <!-- 개인 -->
               <div id="msaMemberMenu" class="d-none">
-                <a class="jp-auth__link" href="http://localhost:8000/user-service/jobseeker/dashboard">마이페이지</a>
+                <a class="jp-auth__link" href="/user-service/jobseeker/dashboard">마이페이지</a>
               </div>
 
               <!-- 로그아웃 -->
