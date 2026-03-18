@@ -88,10 +88,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     	                newTokenCookie.setMaxAge(60 * 30);
     	                response.addCookie(newTokenCookie);
 
-    	                System.out.println("===== 8002 accessToken 자동 재발급 성공");
+    	               
     	            }
     	        } catch (Exception e) {
-    	            System.out.println("===== 8002 토큰 재발급 실패: " + e.getMessage());
+    	            
     	        }
     	    }
     	}
