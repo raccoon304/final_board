@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "tott1111/jobfinder-board"
+        DOCKER_IMAGE = "tott1111/jobfinder-board-anth"
         SERVER_IP = "3.37.62.135"
         APP_DIR = "/home/ubuntu/jobfinder"
     }
