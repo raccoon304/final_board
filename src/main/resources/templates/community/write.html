@@ -133,25 +133,30 @@
     </div>
 
     <script th:inline="javascript">
-    	const contextPath = /*[[@{/}]]*/ "";
         /* ── 비로그인 접근 차단 (header.html 과 동일한 방식) ── */
-        (function () {
-            var loginUserRaw = sessionStorage.getItem('loginUser') || localStorage.getItem('loginUser');
-            var accessToken  = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
-            var isLoggedIn   = false;
+		// 전체 수정
+		(function () {
+		    
+		    var accessToken  = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+		    
 
-            if (loginUserRaw && accessToken) {
-                try {
-                    var loginUser = JSON.parse(loginUserRaw);
-                    if (loginUser) isLoggedIn = true;
-                } catch (e) {}
-            }
-
-            if (!isLoggedIn) {
-                alert('로그인이 필요한 서비스입니다.');
-                location.href = contextPath + 'user-service/member/login';
-            }
-        })();
+			 fetch(window.location.origin + '/user-service/auth/check', {
+			        method: 'GET',
+			        credentials: 'include',
+			        headers: accessToken ? { 'Authorization': 'Bearer ' + accessToken } : {}
+			    })
+			    .then(res => res.json())
+			    .then(data => {
+			        if (!data.success) {
+			            alert('로그인이 필요한 서비스입니다.');
+			            location.href = window.location.origin + '/user-service/member/login';
+			        }
+			    })
+			    .catch(() => {
+			        alert('로그인이 필요한 서비스입니다.');
+			        location.href = window.location.origin + '/user-service/member/login';
+			    });
+			})();
 
         /* ── 폼 유효성 검사 ── */
         function validateForm() {

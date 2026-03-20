@@ -148,8 +148,7 @@ public class CommunityController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
-            response.sendRedirect(loginUrl);
-            return null;
+            return "redirect:/user-service/member/login";
         }
 
         commentService.insertComment(postId, content, parentCommentId, auth.getName());

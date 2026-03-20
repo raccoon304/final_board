@@ -188,10 +188,11 @@
                            th:classappend="${sort == 'comments'} ? 'active'">댓글순</a>
                     </div>
 
-                    <a id="writeBtnArea"
-                       th:href="@{community/write(boardId=${currentBoardId})}"
-                       class="write-button"
-                       style="display:none;">✏️ 글쓰기</a>
+					<a id="writeBtnArea"
+					   th:href="@{community/write(boardId=${currentBoardId})}"
+					   class="write-button"
+					   style="display:none;">✏️ 글쓰기</a>
+					</th:block>
                 </div>
             </div>
 
@@ -333,41 +334,31 @@
     </div>
 
     <script name="scripts" th:inline="javascript">
-        // ✅ contextPath 선언
-        const contextPath = /*[[@{/}]]*/ "";
+        // contextPath 선언
+		var contextPath = /*[[@{/}]]*/ "";
 
-        document.addEventListener('DOMContentLoaded', function () {
+		document.addEventListener('DOMContentLoaded', function () {
+		    var accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
 
-            var loginUserRaw = localStorage.getItem('loginUser');
-            var accessToken  = sessionStorage.getItem('accessToken');
-            var isLoggedIn   = false;
+		    fetch('/user-service/auth/check', {
+		        method: 'GET',
+		        credentials: 'include',
+		        headers: accessToken ? { 'Authorization': 'Bearer ' + accessToken } : {}
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		        if (data.success) {
+		            // 글쓰기 버튼
+		            var writeBtn = document.getElementById('writeBtnArea');
+		            if (writeBtn) writeBtn.style.display = 'inline-flex';
 
-            function isTokenExpired(token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    return payload.exp * 1000 < Date.now();
-                } catch (e) {
-                    return true;
-                }
-            }
-
-            if (loginUserRaw && accessToken && !isTokenExpired(accessToken)) {
-                try {
-                    var loginUser = JSON.parse(loginUserRaw);
-                    if (loginUser) isLoggedIn = true;
-                } catch (e) {
-                    isLoggedIn = false;
-                }
-            }
-
-            if (isLoggedIn) {
-                var writeBtn = document.getElementById('writeBtnArea');
-                if (writeBtn) writeBtn.style.display = 'inline-flex';
-
-                var myActivity = document.getElementById('myActivityWidget');
-                if (myActivity) myActivity.style.display = 'block';
-            }
-        });
+		            // 나의 활동 위젯
+		            var myActivity = document.getElementById('myActivityWidget');
+		            if (myActivity) myActivity.style.display = 'block';
+		        }
+		    })
+		    .catch(() => {});
+		});
     </script>
 
 </section>
