@@ -21,7 +21,7 @@ import com.spring.app.community.service.CommunityService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/community") /*3*/
+@RequestMapping("/community") /*4*/
 public class CommunityController {
 
     private final CommunityService communityService;
