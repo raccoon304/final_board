@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "kimminsoo12/jobfinder-board-minsu"
+        SERVER_IP = "43.201.70.127"
+        APP_DIR = "/home/ubuntu/jobfinder"
+    }
+
+    tools {
+        jdk 'jdk17'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build with Gradle') {
+            steps {
+                sh 'chmod +x ./gradlew'
+                sh './gradlew clean build -x test'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub_info',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker build -t $DOCKER_IMAGE:latest .
+                        docker push $DOCKER_IMAGE:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy Board Service') {
+            steps {
+                sshagent(['SERVER_SSH_KEY']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP '
+                            cd $APP_DIR
+                            docker compose pull board-service
+                            docker compose up -d --no-deps board-service
+                        '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Board service deployment completed successfully."
+        }
+        failure {
+            echo "Board service deployment failed."
+        }
+    }
+}
