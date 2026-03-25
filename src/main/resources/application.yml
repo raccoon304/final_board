@@ -60,13 +60,14 @@ logging:
 
 server:
   port: 8002
+  forward-headers-strategy: framework
   servlet:
     encoding:
       charset: UTF-8
       enabled: true
       force: true
   tomcat:
-    max-part-count: 30
+    max-part-count: 30 
 
 eureka:
   client:
