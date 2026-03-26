@@ -4,7 +4,7 @@
 <configuration>
 
     <!-- domain(DTO) package -->
-	<typeAliases>
+	<typeAliases> 
 		<!--
 		<typeAlias type="com.spring.app.security.domain.MemberDTO" alias="MemberDTO"/>
 		
