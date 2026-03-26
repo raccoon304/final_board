@@ -26,6 +26,14 @@ pipeline {
             }
         }
 
+		stage('SonarQube Analysis') {
+		    steps {
+		        withSonarQubeEnv('sonarqube') {
+		            sh './gradlew sonar -Dsonar.host.url=http://192.168.10.215:9000'
+		        }
+		    }
+		}
+
         stage('Docker Build & Push') {
             steps {
                 withCredentials([usernamePassword(
