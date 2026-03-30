@@ -21,7 +21,7 @@ import com.spring.app.community.service.CommunityService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/community")
+@RequestMapping("/community") /*5*/
 public class CommunityController {
 
     private final CommunityService communityService;
@@ -32,7 +32,7 @@ public class CommunityController {
     
     public CommunityController(CommunityService communityService, CommentService commentService) {
         this.communityService = communityService;
-        this.commentService = commentService;
+        this.commentService = commentService; 
     }
 
     @GetMapping
