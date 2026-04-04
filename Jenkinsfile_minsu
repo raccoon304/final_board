@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "raccoon304/jobfinder-board"
-        SERVER_IP = "50.17.103.160"
+        DOCKER_IMAGE = "kimminsoo12/jobfinder-board-minsu"
+        SERVER_IP = "43.201.70.127"
         APP_DIR = "/home/ubuntu/jobfinder"
     }
 
@@ -25,14 +25,6 @@ pipeline {
                 sh './gradlew clean build -x test'
             }
         }
-
-		stage('SonarQube Analysis') {
-		    steps {
-		        withSonarQubeEnv('sonarqube') {
-		            sh './gradlew sonar -Dsonar.host.url=http://192.168.10.215:9000'
-		        }
-		    }
-		}
 
         stage('Docker Build & Push') {
             steps {
