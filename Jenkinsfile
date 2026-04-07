@@ -52,7 +52,7 @@ pipeline {
 
         stage('Deploy Board Service') {
             steps {
-                sshagent(['SERVER_SSH_KEY']) {
+                sshagent(['jenkins_server_key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP '
                             cd $APP_DIR
