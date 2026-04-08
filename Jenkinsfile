@@ -7,10 +7,6 @@ pipeline {
         APP_DIR = "/home/ubuntu/jobfinder"
     }
 
-    tools {
-        jdk 'jdk17'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -25,7 +21,7 @@ pipeline {
                 sh './gradlew clean build -x test'
             }
         }
-
+/*
 		stage('SonarQube Analysis') {
 		    steps {
 		        withSonarQubeEnv('sonarqube') {
@@ -33,7 +29,7 @@ pipeline {
 		        }
 		    }
 		}
-
+*/
         stage('Docker Build & Push') {
             steps {
                 withCredentials([usernamePassword(
@@ -52,7 +48,7 @@ pipeline {
 
         stage('Deploy Board Service') {
             steps {
-                sshagent(['jenkins_server_key']) {
+                sshagent(['server_ssh_key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP '
                             cd $APP_DIR
